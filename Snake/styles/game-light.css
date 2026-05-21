@@ -1,0 +1,237 @@
+/**
+ * game-light.css
+ * Estilos de la página de juego — modo claro.
+ */
+
+/* ─── Layout principal ───────────────────────────────────────────────────── */
+.game-wrapper {
+  padding:    1.5rem 0;
+  min-height: calc(100vh - var(--navbar-height));
+}
+
+/* ─── Panel de configuración pre-juego ──────────────────────────────────── */
+.setup-panel {
+  max-width:     520px;
+  margin:        0 auto;
+  padding:       2rem;
+  background:    var(--bg-card);
+  border-radius: var(--border-radius);
+  border:        1px solid var(--border-color);
+  box-shadow:    var(--shadow-card);
+}
+
+.setup-title {
+  font-family:   var(--font-pixel);
+  font-size:     1.2rem;
+  color:         var(--accent-green);
+  text-align:    center;
+  margin-bottom: 1.5rem;
+}
+
+/* ─── Selector de modo ───────────────────────────────────────────────────── */
+.mode-selector {
+  display:       flex;
+  gap:           1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mode-btn {
+  flex:           1;
+  padding:        1rem;
+  border:         2px solid var(--border-color);
+  border-radius:  var(--border-radius);
+  background:     var(--bg-primary);
+  cursor:         pointer;
+  text-align:     center;
+  transition:     all var(--transition);
+  font-family:    var(--font-body);
+}
+
+.mode-btn:hover {
+  border-color: var(--accent-green);
+}
+
+.mode-btn.active {
+  border-color: var(--accent-green);
+  background:   #f0faf0;
+  box-shadow:   0 0 0 3px rgba(45, 138, 45, 0.15);
+}
+
+.mode-btn .mode-icon {
+  font-size:     2rem;
+  display:       block;
+  margin-bottom: 0.4rem;
+}
+
+.mode-btn .mode-label {
+  font-weight: 800;
+  font-size:   0.9rem;
+  color:       var(--text-primary);
+}
+
+/* ─── Área del juego ─────────────────────────────────────────────────────── */
+.game-area {
+  display:     none;
+  flex-direction: column;
+  align-items: center;
+  gap:         1rem;
+}
+
+.game-area.active {
+  display: flex;
+}
+
+/* ─── HUD (puntuación + estado) ──────────────────────────────────────────── */
+.game-hud {
+  width:          100%;
+  max-width:      620px;
+  display:        flex;
+  justify-content: space-between;
+  align-items:    center;
+  gap:            1rem;
+  flex-wrap:      wrap;
+}
+
+.score-box {
+  background:    var(--bg-card);
+  border:        1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  padding:       0.6rem 1.2rem;
+  text-align:    center;
+  min-width:     110px;
+}
+
+.score-label {
+  font-size:   0.75rem;
+  font-weight: 700;
+  color:       var(--text-muted);
+  display:     block;
+}
+
+.score-value {
+  font-family:  var(--font-pixel);
+  font-size:    1.3rem;
+  color:        var(--accent-green);
+  display:      block;
+  margin-top:   0.2rem;
+}
+
+.score-box.p2 .score-value {
+  color: var(--accent-blue);
+}
+
+/* ─── Canvas del juego ───────────────────────────────────────────────────── */
+#game-canvas {
+  border:        3px solid var(--accent-green);
+  border-radius: var(--border-radius-sm);
+  display:       block;
+  background:    #e8f5e8;
+  max-width:     100%;
+  image-rendering: pixelated;
+  box-shadow:    var(--shadow-card);
+}
+
+/* ─── Controles de juego ─────────────────────────────────────────────────── */
+.game-controls {
+  display:    flex;
+  gap:        0.75rem;
+  flex-wrap:  wrap;
+  justify-content: center;
+}
+
+/* ─── D-pad táctil (móvil) ───────────────────────────────────────────────── */
+.dpad-container {
+  display:    none;
+  flex-direction: column;
+  align-items: center;
+  gap:         0.3rem;
+  margin-top:  0.5rem;
+}
+
+.dpad-row {
+  display: flex;
+  gap:     0.3rem;
+}
+
+.dpad-btn {
+  width:         52px;
+  height:        52px;
+  border-radius: var(--border-radius-sm);
+  border:        2px solid var(--border-color);
+  background:    var(--bg-card);
+  font-size:     1.3rem;
+  cursor:        pointer;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  transition:    all var(--transition);
+  user-select:   none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dpad-btn:active {
+  background:   var(--accent-green);
+  border-color: var(--accent-green);
+  color:        #fff;
+  transform:    scale(0.9);
+}
+
+.dpad-label {
+  font-size:   0.7rem;
+  font-weight: 800;
+  color:       var(--text-muted);
+  text-align:  center;
+  margin-top:  0.2rem;
+}
+
+.dpad-section {
+  display: flex;
+  gap:     2.5rem;
+}
+
+/* ─── Overlay de fin/pausa ───────────────────────────────────────────────── */
+.game-overlay {
+  position:        absolute;
+  inset:           0;
+  background:      rgba(240, 244, 240, 0.92);
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  border-radius:   var(--border-radius-sm);
+  gap:             1rem;
+  backdrop-filter: blur(3px);
+}
+
+.overlay-title {
+  font-family: var(--font-pixel);
+  font-size:   1.4rem;
+  color:       var(--accent-green);
+  text-align:  center;
+}
+
+.canvas-wrapper {
+  position: relative;
+  display:  inline-block;
+}
+
+/* ─── Nivel / velocidad ──────────────────────────────────────────────────── */
+.level-badge {
+  background:    var(--accent-lime);
+  color:         #1a2e1a;
+  font-weight:   800;
+  border-radius: 999px;
+  padding:       0.3em 0.9em;
+  font-size:     0.85rem;
+}
+
+/* ─── Responsive: mostrar D-pad en táctil ────────────────────────────────── */
+@media (max-width: 768px) {
+  .dpad-container { display: flex; }
+  #game-canvas    { width: 100% !important; height: auto !important; }
+}
+
+@media (max-width: 576px) {
+  .game-hud { justify-content: center; }
+  .mode-selector { flex-direction: column; }
+}   

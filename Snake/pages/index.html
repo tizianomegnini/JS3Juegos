@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🐍 Snake Game</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Estilos del proyecto (modo dinámico) -->
+  <link id="global-css" rel="stylesheet" href="/styles/global-light.css" />
+  <link id="page-css"   rel="stylesheet" href="/styles/index-light.css" />
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ══════════════════════════════════════════════════════════ -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top" role="navigation" aria-label="Navegación principal">
+    <div class="container-fluid px-4">
+
+      <!-- Brand -->
+      <a class="navbar-brand navbar-brand-text" href="/">🐍 SNAKE</a>
+
+      <!-- Hamburguesa -->
+      <button class="navbar-toggler" type="button"
+              data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false"
+              aria-label="Abrir menú">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Links -->
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="/">🏠 Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/game">🎮 Jugar</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/ranking">🏆 Ranking</a>
+          </li>
+        </ul>
+
+        <!-- Toggle de tema -->
+        <button id="theme-toggle" aria-label="Cambiar tema">🌙</button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═════════════════════════════════════════════════════════════ -->
+  <section class="hero-section">
+    <div class="container-fluid px-4">
+      <div class="row align-items-center justify-content-center g-5">
+
+        <!-- Texto e ícono -->
+        <div class="col-12 col-lg-6 text-center text-lg-start">
+          <div class="hero-snake-icon mb-3">🐍</div>
+          <h1 class="hero-title">SNAKE<br>GAME</h1>
+          <p class="hero-subtitle mb-4">
+            El clásico juego de la serpiente. Compite solo o con un amigo,
+            sube de nivel y domina el ranking.
+          </p>
+          <a href="/game" class="btn btn-snake btn-snake-primary btn-lg px-5 me-3">
+            🎮 Jugar ahora
+          </a>
+          <a href="/ranking" class="btn btn-snake btn-snake-outline btn-lg px-4">
+            🏆 Ver ranking
+          </a>
+        </div>
+
+        <!-- Tarjeta de instrucciones rápidas -->
+        <div class="col-12 col-lg-5">
+          <div class="card-custom p-4">
+            <h3 class="section-title">🕹️ CONTROLES</h3>
+            <div class="row g-3">
+              <div class="col-6">
+                <strong class="d-block mb-1" style="color: var(--accent-green);">Jugador 1</strong>
+                <small class="d-block" style="color: var(--text-secondary);">← → ↑ ↓ Flechas</small>
+                <small class="d-block" style="color: var(--text-secondary);">o W A S D</small>
+              </div>
+              <div class="col-6">
+                <strong class="d-block mb-1" style="color: var(--accent-blue);">Jugador 2</strong>
+                <small class="d-block" style="color: var(--text-secondary);">I J K L</small>
+                <small class="d-block" style="color: var(--text-muted);">(modo 2P)</small>
+              </div>
+              <div class="col-12 border-top pt-3" style="border-color: var(--border-color) !important;">
+                <small style="color: var(--text-muted);">
+                  📱 En celular: usa el D-pad táctil en pantalla<br>
+                  ⏸ Pausa: tecla <strong>P</strong> o <strong>ESC</strong>
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SECCIÓN DE JUGADORES ════════════════════════════════════════════ -->
+  <section class="players-section">
+    <div class="container-fluid px-4">
+      <div class="row g-4">
+
+        <!-- Formulario para agregar jugador -->
+        <div class="col-12 col-lg-5">
+          <div class="card-custom p-4">
+            <h2 class="section-title">➕ REGISTRAR JUGADOR</h2>
+
+            <div class="mb-3">
+              <label for="player-name-input" class="form-label-custom">
+                Nombre del jugador
+              </label>
+              <input
+                type="text"
+                id="player-name-input"
+                class="form-control-custom"
+                autocomplete="off"
+                maxlength="30"
+                aria-describedby="player-name-input-error"
+              />
+              <div id="player-name-input-error" class="field-error" role="alert"></div>
+            </div>
+
+            <button id="add-player-btn" class="btn btn-snake btn-snake-primary w-100">
+              ➕ Agregar jugador
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de jugadores registrados -->
+        <div class="col-12 col-lg-7">
+          <div class="card-custom p-4">
+            <h2 class="section-title">👥 JUGADORES REGISTRADOS</h2>
+            <div id="players-list">
+              <!-- Populated via JS -->
+              <div class="empty-state">
+                <span class="empty-icon">👤</span>
+                Cargando jugadores...
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ MODAL EDITAR JUGADOR ════════════════════════════════════════════ -->
+  <div class="modal fade modal-custom" id="edit-modal" tabindex="-1" aria-labelledby="edit-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="edit-modal-label">✏️ EDITAR JUGADOR</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-player-id" />
+          <div class="mb-3">
+            <label for="edit-player-name" class="form-label-custom">Nuevo nombre</label>
+            <input
+              type="text"
+              id="edit-player-name"
+              class="form-control-custom"
+              maxlength="30"
+              aria-describedby="edit-player-name-error"
+            />
+            <div id="edit-player-name-error" class="field-error" role="alert"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-snake btn-snake-outline" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" id="save-edit-btn" class="btn btn-snake btn-snake-primary">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL CONFIRMACIÓN ══════════════════════════════════════════════ -->
+  <div class="modal fade modal-custom" id="confirm-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-body text-center py-4">
+          <p id="confirm-message" class="mb-4" style="color: var(--text-primary); font-weight: 600;"></p>
+          <div class="d-flex gap-2 justify-content-center">
+            <button id="confirm-no"  class="btn btn-snake btn-snake-outline">Cancelar</button>
+            <button id="confirm-yes" class="btn btn-snake btn-snake-danger">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCROLL TOP ══════════════════════════════════════════════════════ -->
+  <button id="scroll-top-btn" aria-label="Volver al inicio">↑</button>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script principal de la página -->
+  <script type="module">
+    import { initTheme }                                  from "/scripts/common/theme.js";
+    import { initScrollTop }                              from "/scripts/common/scrollTop.js";
+    import { initNavbar }                                 from "/scripts/common/navbar.js";
+    import { attachNameValidation, validateName,
+             validateForm, setFieldError }                from "/scripts/common/validations.js";
+    import { fetchPlayers, createPlayer,
+             updatePlayer, deletePlayer }                 from "/scripts/common/storage.js";
+    import { showToast, formatDate,
+             confirmAction, getInitials,
+             setButtonLoading }                           from "/scripts/common/ui.js";
+
+    // ─── Init ────────────────────────────────────────────────────────────
+    document.addEventListener("DOMContentLoaded", () => {
+      initTheme();
+      initScrollTop();
+      initNavbar();
+      loadPlayers();
+      setupForm();
+    });
+
+    // ─── Cargar jugadores ────────────────────────────────────────────────
+    async function loadPlayers() {
+      const list = document.getElementById("players-list");
+      try {
+        const players = await fetchPlayers();
+        renderPlayerList(players);
+      } catch {
+        list.innerHTML = `<div class="empty-state"><span class="empty-icon">⚠️</span>Error al cargar jugadores.</div>`;
+      }
+    }
+
+    /**
+     * Renderiza la lista de jugadores en el DOM.
+     * @param {Array} players
+     */
+    function renderPlayerList(players) {
+      const list = document.getElementById("players-list");
+
+      if (!players.length) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <span class="empty-icon">👤</span>
+            No hay jugadores registrados todavía.<br>
+            <small>¡Regístrá el primero arriba!</small>
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = players.map(p => `
+        <div class="player-item" data-id="${p.id}">
+          <div class="player-avatar">${getInitials(p.name)}</div>
+          <span class="player-name">${escapeHtml(p.name)}</span>
+          <span class="player-date">${formatDate(p.createdAt)}</span>
+          <div class="player-actions">
+            <button class="btn-icon btn-icon-edit"
+                    onclick="openEditModal('${p.id}', '${escapeHtml(p.name)}')"
+                    aria-label="Editar ${escapeHtml(p.name)}">✏️</button>
+            <button class="btn-icon btn-icon-delete"
+                    onclick="deletePlayerById('${p.id}', '${escapeHtml(p.name)}')"
+                    aria-label="Eliminar ${escapeHtml(p.name)}">🗑️</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // ─── Formulario de alta ──────────────────────────────────────────────
+    function setupForm() {
+      const input = document.getElementById("player-name-input");
+      const btn   = document.getElementById("add-player-btn");
+
+      // Validación en tiempo real
+      attachNameValidation(input);
+
+      btn.addEventListener("click", async () => {
+        const isValid = validateForm([input], [validateName]);
+        if (!isValid) return;
+
+        setButtonLoading(btn, true);
+        try {
+          await createPlayer(input.value.trim());
+          showToast(`¡Jugador "${input.value.trim()}" registrado!`, "success");
+          input.value = "";
+          input.classList.remove("is-valid");
+          await loadPlayers();
+        } catch (e) {
+          showToast(e.message, "error");
+        } finally {
+          setButtonLoading(btn, false, "➕ Agregar jugador");
+        }
+      });
+
+      // Enviar con Enter
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") btn.click();
+      });
+    }
+
+    // ─── Editar jugador ──────────────────────────────────────────────────
+    window.openEditModal = (id, name) => {
+      document.getElementById("edit-player-id").value   = id;
+      document.getElementById("edit-player-name").value = name;
+
+      const nameInput = document.getElementById("edit-player-name");
+      nameInput.classList.remove("is-invalid", "is-valid");
+
+      const { attachNameValidation: attach } = window._validations || {};
+
+      const bsModal = new bootstrap.Modal(document.getElementById("edit-modal"));
+      bsModal.show();
+    };
+
+    // Validación en tiempo real del campo de edición
+    document.addEventListener("DOMContentLoaded", () => {
+      const editInput = document.getElementById("edit-player-name");
+      attachNameValidation(editInput);
+    });
+
+    document.getElementById("save-edit-btn").addEventListener("click", async () => {
+      const id    = document.getElementById("edit-player-id").value;
+      const input = document.getElementById("edit-player-name");
+
+      const isValid = validateForm([input], [validateName]);
+      if (!isValid) return;
+
+      const btn = document.getElementById("save-edit-btn");
+      setButtonLoading(btn, true);
+      try {
+        await updatePlayer(id, input.value.trim());
+        bootstrap.Modal.getInstance(document.getElementById("edit-modal")).hide();
+        showToast("Jugador actualizado.", "success");
+        await loadPlayers();
+      } catch (e) {
+        showToast(e.message, "error");
+      } finally {
+        setButtonLoading(btn, false, "Guardar");
+      }
+    });
+
+    // ─── Eliminar jugador ────────────────────────────────────────────────
+    window.deletePlayerById = async (id, name) => {
+      const confirmed = await confirmAction(`¿Eliminar a "${name}" y todos sus puntajes?`);
+      if (!confirmed) return;
+      try {
+        await deletePlayer(id);
+        showToast(`"${name}" eliminado.`, "success");
+        await loadPlayers();
+      } catch (e) {
+        showToast(e.message, "error");
+      }
+    };
+
+    /** Escapa HTML para evitar XSS */
+    function escapeHtml(str) {
+      return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+  </script>
+
+</body>
+</html>
