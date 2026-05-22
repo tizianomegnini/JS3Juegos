@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pacman Clone</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- MENU -->
+  <div id="menu" class="screen">
+    <h1>🟡 PAC-MAN</h1>
+    <p class="subtitle">Flechas / WASD para moverse</p>
+    <button id="playBtn">▶ JUGAR</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="gameContainer" style="display:none;">
+    <div id="hud">
+      <span>PUNTOS: <span id="score">0</span></span>
+      <span>NIVEL: <span id="level">1</span></span>
+      <span>VIDAS: <span id="lives">❤❤❤</span></span>
+    </div>
+    <canvas id="game"></canvas>
+    <div id="dpad">
+      <div class="drow"><button class="dpbtn" data-dir="up">▲</button></div>
+      <div class="drow">
+        <button class="dpbtn" data-dir="left">◀</button>
+        <button class="dpbtn" data-dir="down">▼</button>
+        <button class="dpbtn" data-dir="right">▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div id="gameOver" class="screen" style="display:none;">
+    <h1>💀 GAME OVER</h1>
+    <p class="subtitle">PUNTOS: <span id="finalScore">0</span></p>
+    <button onclick="location.reload()">↩ REINTENTAR</button>
+  </div>
+
+  <!-- WIN -->
+  <div id="winScreen" class="screen" style="display:none;">
+    <h1>🏆 ¡GANASTE!</h1>
+    <p class="subtitle">PUNTOS: <span id="winScore">0</span></p>
+    <button onclick="location.reload()">▶ JUGAR DE NUEVO</button>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
