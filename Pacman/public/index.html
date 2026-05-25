@@ -9,44 +9,61 @@
 </head>
 <body>
 
-  <!-- MENU -->
-  <div id="menu" class="screen">
-    <h1>🟡 PAC-MAN</h1>
-    <p class="subtitle">Flechas / WASD para moverse</p>
-    <button id="playBtn">▶ JUGAR</button>
-  </div>
+<div id="root" style="background:#000;padding:16px;border-radius:8px;min-height:400px">
 
-  <!-- GAME -->
-  <div id="gameContainer" style="display:none;">
-    <div id="hud">
-      <span>PUNTOS: <span id="score">0</span></span>
-      <span>NIVEL: <span id="level">1</span></span>
-      <span>VIDAS: <span id="lives">❤❤❤</span></span>
-    </div>
-    <canvas id="game"></canvas>
-    <div id="dpad">
-      <div class="drow"><button class="dpbtn" data-dir="up">▲</button></div>
-      <div class="drow">
-        <button class="dpbtn" data-dir="left">◀</button>
-        <button class="dpbtn" data-dir="down">▼</button>
-        <button class="dpbtn" data-dir="right">▶</button>
-      </div>
-    </div>
-  </div>
+<div id="menuScreen" class="screen active">
+  <h1>PAC-MAN</h1>
+  <p class="subtitle">ARROW KEYS / WASD · P = PAUSA · R = REINICIAR</p>
+  <p id="hsDisplay" class="subtitle" style="color:#FFD700"></p>
+  <button class="btn" id="playBtn">JUGAR</button>
+</div>
 
-  <!-- GAME OVER -->
-  <div id="gameOver" class="screen" style="display:none;">
-    <h1>💀 GAME OVER</h1>
-    <p class="subtitle">PUNTOS: <span id="finalScore">0</span></p>
-    <button onclick="location.reload()">↩ REINTENTAR</button>
-  </div>
+<div id="gameOverScreen" class="screen">
+  <h1 style="font-size:28px;color:#f44">GAME OVER</h1>
+  <p class="label">PUNTUACIÓN</p>
+  <p class="score-big" id="finalScore">0</p>
+  <p class="label" id="newHsLabel" style="display:none;color:#FFD700">¡NUEVO RÉCORD!</p>
+  <button class="btn" id="goBtn">REINTENTAR</button>
+</div>
 
-  <!-- WIN -->
-  <div id="winScreen" class="screen" style="display:none;">
-    <h1>🏆 ¡GANASTE!</h1>
-    <p class="subtitle">PUNTOS: <span id="winScore">0</span></p>
-    <button onclick="location.reload()">▶ JUGAR DE NUEVO</button>
+<div id="winScreen" class="screen">
+  <h1 style="color:#0f0">¡GANASTE!</h1>
+  <p class="label">PUNTUACIÓN FINAL</p>
+  <p class="score-big" id="winScore">0</p>
+  <button class="btn" id="winBtn">JUGAR DE NUEVO</button>
+</div>
+
+<div id="hud">
+  <div class="hud-item"><span class="hud-label">SCORE</span><span class="hud-val" id="scoreUI">0</span></div>
+  <div class="hud-item"><span class="hud-label">RECORD</span><span class="hud-val" id="hsUI">0</span></div>
+  <div class="hud-item"><span class="hud-label">NIVEL</span><span class="hud-val" id="levelUI">1</span></div>
+  <div class="hud-item"><span class="hud-label">VIDAS</span><span class="hud-val" id="livesUI">❤❤❤</span></div>
+</div>
+
+<div id="canvasWrap">
+  <canvas id="game"></canvas>
+  <div id="comboMsg"></div>
+  <div id="pauseOverlay">
+    <p>PAUSA</p>
+    <small>Presioná P para continuar</small>
   </div>
+</div>
+
+<div id="dpad">
+  <div class="dpad-grid">
+    <div class="dp-empty"></div>
+    <button class="dpbtn" data-dir="up">▲</button>
+    <div class="dp-empty"></div>
+    <button class="dpbtn" data-dir="left">◀</button>
+    <div class="dp-empty"></div>
+    <button class="dpbtn" data-dir="right">▶</button>
+    <div class="dp-empty"></div>
+    <button class="dpbtn" data-dir="down">▼</button>
+    <div class="dp-empty"></div>
+  </div>
+</div>
+
+</div>
 
   <script src="main.js"></script>
 </body>
