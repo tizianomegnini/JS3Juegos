@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🐍 Snake — Jugar</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Estilos del proyecto -->
+  <link id="global-css" rel="stylesheet" href="/styles/global-light.css" />
+  <link id="page-css"   rel="stylesheet" href="/styles/game-light.css" />
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ══════════════════════════════════════════════════════════ -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top" role="navigation" aria-label="Navegación principal">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand navbar-brand-text" href="/">🐍 SNAKE</a>
+      <button class="navbar-toggler" type="button"
+              data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menú">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="/">🏠 Inicio</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/game">🎮 Jugar</a></li>
+          <li class="nav-item"><a class="nav-link" href="/ranking">🏆 Ranking</a></li>
+        </ul>
+        <button id="theme-toggle" aria-label="Cambiar tema">🌙</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ CONTENIDO PRINCIPAL ══════════════════════════════════════════════ -->
+  <main class="game-wrapper">
+    <div class="container-fluid px-4">
+
+      <!-- ── PANEL DE CONFIGURACIÓN (pre-juego) ─────────────────────────── -->
+      <div id="setup-panel" class="setup-panel">
+        <h1 class="setup-title">🎮 CONFIGURAR PARTIDA</h1>
+
+        <!-- Selector de modo -->
+        <div class="mode-selector">
+          <button class="mode-btn active" data-mode="1P" id="btn-1p">
+            <span class="mode-icon">👤</span>
+            <span class="mode-label">1 JUGADOR</span>
+          </button>
+          <button class="mode-btn" data-mode="2P" id="btn-2p">
+            <span class="mode-icon">👥</span>
+            <span class="mode-label">2 JUGADORES</span>
+          </button>
+        </div>
+
+        <!-- Botón de inicio -->
+        <button id="start-btn" class="btn btn-snake btn-snake-primary w-100 mt-2">
+          ▶ INICIAR PARTIDA
+        </button>
+      </div>
+
+      <!-- ── ÁREA DE JUEGO ──────────────────────────────────────────────── -->
+      <div id="game-area" class="game-area">
+
+        <!-- HUD -->
+        <div class="game-hud">
+          <div class="score-box">
+            <span class="score-label">🟢 JUGADOR 1</span>
+            <span class="score-value" id="score-p1">0</span>
+            <small class="score-label" id="level-p1">NIV 1</small>
+          </div>
+
+          <div style="text-align:center;">
+            <div class="score-value" id="timer-display" style="font-size:1rem;">00:00</div>
+            <div class="d-flex gap-2 justify-content-center mt-1">
+              <button id="pause-btn" class="btn btn-snake btn-snake-outline btn-sm">⏸ Pausa</button>
+              <button id="mute-btn"  class="btn btn-snake btn-snake-outline btn-sm">🔊</button>
+              <button id="stop-btn"  class="btn btn-snake btn-snake-danger btn-sm">⏹</button>
+            </div>
+          </div>
+
+          <div class="score-box p2" id="score-box-p2" style="display:none;">
+            <span class="score-label">🔵 JUGADOR 2</span>
+            <span class="score-value" id="score-p2">0</span>
+            <small class="score-label" id="level-p2">NIV 1</small>
+          </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas-wrapper">
+          <canvas id="game-canvas" width="600" height="600"></canvas>
+        </div>
+
+        <!-- D-pads táctiles -->
+        <div class="dpad-section">
+          <div class="dpad-container" id="dpad-p1">
+            <div class="dpad-row">
+              <button class="dpad-btn" data-dir="UP">▲</button>
+            </div>
+            <div class="dpad-row">
+              <button class="dpad-btn" data-dir="LEFT">◄</button>
+              <button class="dpad-btn" data-dir="DOWN">▼</button>
+              <button class="dpad-btn" data-dir="RIGHT">►</button>
+            </div>
+            <div class="dpad-label">J1</div>
+          </div>
+
+          <div class="dpad-container" id="dpad-p2" style="display:none;">
+            <div class="dpad-row">
+              <button class="dpad-btn" data-dir="UP">▲</button>
+            </div>
+            <div class="dpad-row">
+              <button class="dpad-btn" data-dir="LEFT">◄</button>
+              <button class="dpad-btn" data-dir="DOWN">▼</button>
+              <button class="dpad-btn" data-dir="RIGHT">►</button>
+            </div>
+            <div class="dpad-label">J2</div>
+          </div>
+        </div>
+
+      </div><!-- /game-area -->
+
+    </div>
+  </main>
+
+  <!-- ═══ MODAL: INGRESAR INICIALES (FIN DE PARTIDA) ═══════════════════════ -->
+  <div class="modal fade modal-custom" id="initials-modal" tabindex="-1"
+       aria-labelledby="initials-modal-label" aria-hidden="true"
+       data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="initials-modal-label">🏆 FIN DE PARTIDA</h5>
+        </div>
+        <div class="modal-body text-center">
+          <div id="end-result-msg" class="mb-3" style="color: var(--text-primary); font-weight:700;"></div>
+
+          <!-- Bloque jugador 1 -->
+          <div id="initials-block-p1" class="mb-3">
+            <label class="form-label-custom mb-1" id="initials-label-p1">
+              🟢 Jugador 1 — Ingresá tus iniciales:
+            </label>
+            <input type="text" id="initials-p1" class="form-control-custom text-center"
+                   maxlength="3" autocomplete="off" autocapitalize="characters"
+                   style="font-family: var(--font-pixel); font-size:1.4rem; letter-spacing:0.4em; text-align:center;"
+                   placeholder="AAA" />
+            <div id="initials-p1-error" class="field-error" role="alert"></div>
+          </div>
+
+          <!-- Bloque jugador 2 (solo 2P) -->
+          <div id="initials-block-p2" class="mb-2" style="display:none;">
+            <label class="form-label-custom mb-1" id="initials-label-p2">
+              🔵 Jugador 2 — Ingresá tus iniciales:
+            </label>
+            <input type="text" id="initials-p2" class="form-control-custom text-center"
+                   maxlength="3" autocomplete="off" autocapitalize="characters"
+                   style="font-family: var(--font-pixel); font-size:1.4rem; letter-spacing:0.4em; text-align:center;"
+                   placeholder="AAA" />
+            <div id="initials-p2-error" class="field-error" role="alert"></div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button id="save-initials-btn" class="btn btn-snake btn-snake-primary w-100">
+            💾 GUARDAR Y VER RANKING
+          </button>
+          <button id="skip-initials-btn" class="btn btn-snake btn-snake-outline w-100 mt-2">
+            🔁 Jugar de nuevo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCROLL TOP ════════════════════════════════════════════════════════ -->
+  <button id="scroll-top-btn" aria-label="Volver al inicio">↑</button>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script type="module">
+    import { initTheme }    from "/scripts/common/theme.js";
+    import { initNavbar }   from "/scripts/common/navbar.js";
+    import { initScrollTop } from "/scripts/common/scrollTop.js";
+    import { showToast }    from "/scripts/common/ui.js";
+    import { saveScore }    from "/scripts/common/storage.js";
+    import {
+      initGame, startGame, stopGame,
+      togglePause, toggleMute, getMuted,
+      getIsRunning, getIsPaused
+    } from "/scripts/snakes/game.js";
+
+    initTheme();
+    initNavbar();
+    initScrollTop();
+
+    // ─── Estado de configuración ───────────────────────────────────────────
+    let selectedMode = "1P";
+    let currentScores = null;  // { score1, score2, result, mode }
+
+    // ─── Selector de modo ──────────────────────────────────────────────────
+    document.querySelectorAll(".mode-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedMode = btn.dataset.mode;
+      });
+    });
+
+    // ─── Iniciar partida ───────────────────────────────────────────────────
+    // ── reemplazar el addEventListener de "start-btn" ──
+document.getElementById("start-btn").addEventListener("click", () => {
+  document.getElementById("setup-panel").style.display = "none";
+  const gameArea = document.getElementById("game-area");
+  gameArea.classList.add("active");
+
+  // ✦ Ocultar navbar mientras se juega
+  document.querySelector("nav.navbar").classList.add("navbar--hidden");
+  document.querySelector("nav.navbar").setAttribute("aria-hidden", "true");
+
+  const is2P = selectedMode === "2P";
+  document.getElementById("score-box-p2").style.display = is2P ? "" : "none";
+  document.getElementById("dpad-p2").style.display       = is2P ? "" : "none";
+
+  const canvas = document.getElementById("game-canvas");
+  initGame(canvas, {
+    mode: selectedMode,
+    p1:   { id: null, name: "J1" },
+    p2:   { id: null, name: "J2" },
+    onEnd:   handleGameEnd,
+    onScore: handleScoreUpdate,
+    onTimer: t => { document.getElementById("timer-display").textContent = t; }
+  });
+  startGame();
+});
+
+// ── reemplazar returnToSetup ──
+function returnToSetup() {
+  // ✦ Restaurar navbar
+  const nav = document.querySelector("nav.navbar");
+  nav.classList.remove("navbar--hidden");
+  nav.removeAttribute("aria-hidden");
+
+  document.getElementById("game-area").classList.remove("active");
+  document.getElementById("setup-panel").style.display = "";
+  document.getElementById("score-p1").textContent = "0";
+  document.getElementById("score-p2").textContent = "0";
+  document.getElementById("level-p1").textContent = "NIV 1";
+  document.getElementById("level-p2").textContent = "NIV 1";
+  document.getElementById("timer-display").textContent = "00:00";
+  document.getElementById("pause-btn").textContent = "⏸ Pausa";
+}
+
+    // ─── Actualizar HUD ────────────────────────────────────────────────────
+    function handleScoreUpdate({ score1, score2, level1, level2 }) {
+      document.getElementById("score-p1").textContent = score1;
+      document.getElementById("score-p2").textContent = score2;
+      document.getElementById("level-p1").textContent = "NIV " + level1;
+      document.getElementById("level-p2").textContent = "NIV " + level2;
+    }
+
+    // ─── Fin de partida → mostrar modal de iniciales ───────────────────────
+    function handleGameEnd({ score1, score2, result, mode }) {
+      currentScores = { score1, score2, result, mode };
+
+      // Armar mensaje de resultado
+      let msg = "";
+      if (mode === "1P") {
+        msg = `Puntaje final: <strong>${score1}</strong>`;
+      } else {
+        if (result === "p1") msg = `🟢 ¡Ganó Jugador 1! <strong>${score1}</strong> vs ${score2}`;
+        else if (result === "p2") msg = `🔵 ¡Ganó Jugador 2! ${score1} vs <strong>${score2}</strong>`;
+        else msg = `¡Empate! ${score1} — ${score2}`;
+      }
+      document.getElementById("end-result-msg").innerHTML = msg;
+
+      // Mostrar bloque P2 solo en 2P
+      const is2P = mode === "2P";
+      document.getElementById("initials-block-p2").style.display = is2P ? "" : "none";
+
+      // Limpiar campos
+      ["initials-p1", "initials-p2"].forEach(id => {
+        const el = document.getElementById(id);
+        el.value = "";
+        el.classList.remove("is-invalid", "is-valid");
+      });
+      document.getElementById("initials-p1-error").textContent = "";
+      document.getElementById("initials-p2-error").textContent = "";
+
+      new bootstrap.Modal(document.getElementById("initials-modal")).show();
+    }
+
+    // ─── Validar iniciales ─────────────────────────────────────────────────
+    function validateInitials(value) {
+      const clean = value.trim().toUpperCase();
+      if (!clean) return "Ingresá al menos 1 letra.";
+      if (!/^[A-Z]{1,3}$/.test(clean)) return "Solo letras, máximo 3.";
+      return null;
+    }
+
+    // Uppercase automático al escribir
+    ["initials-p1", "initials-p2"].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener("input", () => {
+        el.value = el.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3);
+      });
+    });
+
+    // ─── Guardar iniciales ─────────────────────────────────────────────────
+    document.getElementById("save-initials-btn").addEventListener("click", () => {
+      const inp1 = document.getElementById("initials-p1");
+      const inp2 = document.getElementById("initials-p2");
+      const err1 = document.getElementById("initials-p1-error");
+      const err2 = document.getElementById("initials-p2-error");
+      const is2P = currentScores?.mode === "2P";
+
+      const e1 = validateInitials(inp1.value);
+      err1.textContent = e1 || "";
+      err1.classList.toggle("visible", !!e1);
+      inp1.classList.toggle("is-invalid", !!e1);
+
+      let e2 = null;
+      if (is2P) {
+        e2 = validateInitials(inp2.value);
+        err2.textContent = e2 || "";
+        err2.classList.toggle("visible", !!e2);
+        inp2.classList.toggle("is-invalid", !!e2);
+      }
+
+      if (e1 || e2) return;
+
+      // Guardar en localStorage
+      saveScore({ initials: inp1.value, score: currentScores.score1, mode: currentScores.mode });
+      if (is2P) {
+        saveScore({ initials: inp2.value, score: currentScores.score2, mode: currentScores.mode });
+      }
+
+      bootstrap.Modal.getInstance(document.getElementById("initials-modal")).hide();
+      showToast("¡Puntaje guardado! 🏆", "success");
+      window.location.href = "/ranking";
+    });
+
+    // ─── Jugar de nuevo sin guardar ────────────────────────────────────────
+    document.getElementById("skip-initials-btn").addEventListener("click", () => {
+      bootstrap.Modal.getInstance(document.getElementById("initials-modal")).hide();
+      returnToSetup();
+    });
+
+  </script>
+
+</body>
+</html>

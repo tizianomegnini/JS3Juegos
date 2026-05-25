@@ -1,88 +1,245 @@
 /**
- * controls.js
- * Módulo de controles de teclado y táctiles para las serpientes.
- * Soporta 1 o 2 jugadores con controles separados.
+ * renderer.js
+ * Módulo de renderizado del juego Snake.
+ * Dibuja el tablero, las serpientes, la comida y los overlays.
  */
 
-/**
- * Mapeo de teclas para cada jugador.
- * Jugador 1: WASD | Flechas
- * Jugador 2: IJKL
- */
-const KEY_MAP = {
-  // Jugador 1 — Flechas
-  "ArrowUp":    { player: 1, dir: "UP"    },
-  "ArrowDown":  { player: 1, dir: "DOWN"  },
-  "ArrowLeft":  { player: 1, dir: "LEFT"  },
-  "ArrowRight": { player: 1, dir: "RIGHT" },
-  // Jugador 1 — WASD
-  "w": { player: 1, dir: "UP"    },
-  "s": { player: 1, dir: "DOWN"  },
-  "a": { player: 1, dir: "LEFT"  },
-  "d": { player: 1, dir: "RIGHT" },
-  "W": { player: 1, dir: "UP"    },
-  "S": { player: 1, dir: "DOWN"  },
-  "A": { player: 1, dir: "LEFT"  },
-  "D": { player: 1, dir: "RIGHT" },
-  // Jugador 2 — IJKL
-  "i": { player: 2, dir: "UP"    },
-  "k": { player: 2, dir: "DOWN"  },
-  "j": { player: 2, dir: "LEFT"  },
-  "l": { player: 2, dir: "RIGHT" },
-  "I": { player: 2, dir: "UP"    },
-  "K": { player: 2, dir: "DOWN"  },
-  "J": { player: 2, dir: "LEFT"  },
-  "L": { player: 2, dir: "RIGHT" }
-};
+import { CELL_SIZE, COLS, ROWS, clearBoard, drawGrid } from "./board.js";
 
-/**
- * Registra los controles de teclado.
- * @param {Function} onInput - Callback: ({ player, dir }) => void
- * @param {Function} [onPause] - Callback al presionar Escape o P
- * @returns {Function} Función para desregistrar los eventos
- */
-export function registerKeyboardControls(onInput, onPause) {
-  const handler = (e) => {
-    // Prevenir scroll con flechas
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-      e.preventDefault();
-    }
-
-    if ((e.key === "Escape" || e.key === "p" || e.key === "P") && onPause) {
-      onPause();
-      return;
-    }
-
-    const action = KEY_MAP[e.key];
-    if (action) onInput(action);
+/** Colores del tablero según el tema activo */
+function getBoardColors() {
+  const dark = document.documentElement.dataset.theme === "dark";
+  return {
+    bg:   dark ? "#0d1f0d" : "#e8f5e8",
+    grid: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)"
   };
-
-  window.addEventListener("keydown", handler);
-
-  // Retorna función para limpiar
-  return () => window.removeEventListener("keydown", handler);
 }
 
 /**
- * Registra controles táctiles para el D-pad.
- * @param {HTMLElement} container - Elemento que contiene los botones .dpad-btn
- * @param {Function} onInput - Callback: ({ player, dir }) => void
- * @param {number} [playerNum=1] - Número de jugador (1 o 2)
+ * Renderiza un frame completo del juego.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {{ snake1: Snake, snake2: Snake|null, food: Food }} state
  */
-export function registerDpadControls(container, onInput, playerNum = 1) {
-  if (!container) return;
+export function renderFrame(ctx, { snake1, snake2, food }) {
+  const { bg, grid } = getBoardColors();
 
-  container.querySelectorAll(".dpad-btn").forEach(btn => {
-    const dir = btn.dataset.dir;
-    if (!dir) return;
+  clearBoard(ctx, bg);
+  drawGrid(ctx, grid);
+  drawFood(ctx, food);
+  drawSnake(ctx, snake1);
+  if (snake2 && snake2.alive) drawSnake(ctx, snake2);
+}
 
-    btn.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      onInput({ player: playerNum, dir });
-    }, { passive: false });
+// ─── Comida ────────────────────────────────────────────────────────────────
 
-    btn.addEventListener("mousedown", () => {
-      onInput({ player: playerNum, dir });
-    });
+/**
+ * Dibuja la comida en el canvas.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Food} food
+ */
+function drawFood(ctx, food) {
+  const { x, y } = food.position;
+  const px = x * CELL_SIZE;
+  const py = y * CELL_SIZE;
+
+  // Fondo circular suave
+  ctx.fillStyle = "rgba(255, 220, 80, 0.18)";
+  ctx.beginPath();
+  ctx.arc(px + CELL_SIZE / 2, py + CELL_SIZE / 2, CELL_SIZE / 2 - 1, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Emoji de la comida
+  ctx.font = `${CELL_SIZE - 4}px serif`;
+  ctx.textAlign    = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(food.type.emoji, px + CELL_SIZE / 2, py + CELL_SIZE / 2 + 1);
+
+  // Reset
+  ctx.textAlign    = "start";
+  ctx.textBaseline = "alphabetic";
+}
+
+// ─── Serpiente ─────────────────────────────────────────────────────────────
+
+/**
+ * Dibuja una serpiente completa (cuerpo + cabeza + ojos).
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Snake} snake
+ */
+function drawSnake(ctx, snake) {
+  if (!snake || !snake.body.length) return;
+
+  // Dibujar segmentos del cuerpo (todos excepto la cabeza)
+  for (let i = snake.body.length - 1; i >= 1; i--) {
+    drawBodySegment(ctx, snake.body[i], snake.color, i, snake.body.length);
+  }
+
+  // Dibujar cabeza
+  drawHead(ctx, snake);
+}
+
+/**
+ * Dibuja un segmento del cuerpo con ligero efecto de degradado.
+ */
+function drawBodySegment(ctx, cell, color, index, total) {
+  const px     = cell.x * CELL_SIZE + 1;
+  const py     = cell.y * CELL_SIZE + 1;
+  const size   = CELL_SIZE - 2;
+  const radius = 4;
+
+  // Ligeramente más oscuro hacia la cola
+  const alpha = 0.6 + 0.4 * (1 - index / total);
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle   = color;
+
+  roundRect(ctx, px, py, size, size, radius);
+  ctx.fill();
+
+  ctx.globalAlpha = 1;
+}
+
+/**
+ * Dibuja la cabeza con estilo de gato.
+ */
+function drawHead(ctx, snake) {
+  const head = snake.body[0];
+  const px   = head.x * CELL_SIZE + 1;
+  const py   = head.y * CELL_SIZE + 1;
+  const size = CELL_SIZE - 2;
+
+  // Cabeza
+  ctx.fillStyle = snake.headColor;
+  roundRect(ctx, px, py + 3, size, size - 4, 8);
+  ctx.fill();
+
+  // Orejas
+  ctx.beginPath();
+  ctx.moveTo(px + 4, py + 4);
+  ctx.lineTo(px + 10, py + 4);
+  ctx.lineTo(px + 6, py + 10);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(px + size - 4, py + 4);
+  ctx.lineTo(px + size - 10, py + 4);
+  ctx.lineTo(px + size - 6, py + 10);
+  ctx.closePath();
+  ctx.fill();
+
+  // Nariz y bigotes
+  const noseX = px + size / 2;
+  const noseY = py + size / 2 + 2;
+  ctx.fillStyle = "#ff9da4";
+  ctx.beginPath();
+  ctx.moveTo(noseX, noseY);
+  ctx.lineTo(noseX - 2.5, noseY + 4);
+  ctx.lineTo(noseX + 2.5, noseY + 4);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = snake.eyeColor;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(noseX - 3, noseY + 5);
+  ctx.lineTo(noseX - 8, noseY + 3);
+  ctx.moveTo(noseX - 3, noseY + 6);
+  ctx.lineTo(noseX - 8, noseY + 7);
+  ctx.moveTo(noseX + 3, noseY + 5);
+  ctx.lineTo(noseX + 8, noseY + 3);
+  ctx.moveTo(noseX + 3, noseY + 6);
+  ctx.lineTo(noseX + 8, noseY + 7);
+  ctx.stroke();
+  ctx.lineWidth = 1;
+
+  // Ojos
+  drawEyes(ctx, head, snake.direction, snake.eyeColor);
+}
+
+/**
+ * Dibuja los ojos con un trazo más felino.
+ */
+function drawEyes(ctx, head, direction, eyeColor) {
+  const cx = head.x * CELL_SIZE + CELL_SIZE / 2;
+  const cy = head.y * CELL_SIZE + CELL_SIZE / 2;
+  const r  = 2.5;
+  const offset = 4;
+
+  let eye1, eye2;
+
+  switch (direction) {
+    case "RIGHT":
+      eye1 = { x: cx + 3, y: cy - offset };
+      eye2 = { x: cx + 3, y: cy + offset };
+      break;
+    case "LEFT":
+      eye1 = { x: cx - 3, y: cy - offset };
+      eye2 = { x: cx - 3, y: cy + offset };
+      break;
+    case "UP":
+      eye1 = { x: cx - offset, y: cy - 3 };
+      eye2 = { x: cx + offset, y: cy - 3 };
+      break;
+    case "DOWN":
+    default:
+      eye1 = { x: cx - offset, y: cy + 3 };
+      eye2 = { x: cx + offset, y: cy + 3 };
+      break;
+  }
+
+  ctx.fillStyle = eyeColor;
+  [eye1, eye2].forEach(eye => {
+    ctx.beginPath();
+    ctx.ellipse(eye.x, eye.y, r, r + 1.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "#000";
+    ctx.beginPath();
+    ctx.ellipse(eye.x + 0.5, eye.y + 0.5, r * 0.4, r, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = eyeColor;
   });
+}
+
+// ─── Overlay de pausa ──────────────────────────────────────────────────────
+
+/**
+ * Dibuja el overlay semitransparente de pausa sobre el canvas.
+ * @param {CanvasRenderingContext2D} ctx
+ */
+export function drawPauseOverlay(ctx) {
+  const w = ctx.canvas.width;
+  const h = ctx.canvas.height;
+
+  ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.fillStyle    = "#ffffff";
+  ctx.font         = "bold 20px 'Press Start 2P', monospace";
+  ctx.textAlign    = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("⏸ PAUSA", w / 2, h / 2);
+
+  ctx.font      = "12px 'Press Start 2P', monospace";
+  ctx.fillStyle = "rgba(255,255,255,0.7)";
+  ctx.fillText("Presioná P para continuar", w / 2, h / 2 + 40);
+
+  ctx.textAlign    = "start";
+  ctx.textBaseline = "alphabetic";
+}
+
+// ─── Helper: rect con bordes redondeados ───────────────────────────────────
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }

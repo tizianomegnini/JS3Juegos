@@ -1,104 +1,60 @@
 /**
  * storage.js
- * Módulo de acceso a la API REST del servidor.
- * Abstrae todos los fetch hacia /api/players y /api/scores.
+ * Módulo de acceso a localStorage.
+ * Guarda entradas con { initials: "AAA", score: 999, mode: "1P", date: "ISO" }.
  */
 
-const BASE = "";
-
-// ─── Jugadores ─────────────────────────────────────────────────────────────
+const STORAGE_KEY = "snake-scores";
+const MAX_ENTRIES = 100;
 
 /**
- * Obtiene todos los jugadores registrados.
- * @returns {Promise<Array>}
+ * Lee todas las entradas guardadas.
+ * @returns {Array<{initials:string, score:number, mode:string, date:string}>}
  */
-export async function fetchPlayers() {
-  const res = await fetch(`${BASE}/api/players`);
-  if (!res.ok) throw new Error("Error al cargar jugadores");
-  return res.json();
+export function getScores() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
 }
 
 /**
- * Crea un nuevo jugador.
- * @param {string} name
- * @returns {Promise<Object>}
+ * Guarda una nueva entrada de puntaje.
+ * @param {Object} entry
+ * @param {string} entry.initials  - Exactamente 3 letras mayúsculas
+ * @param {number} entry.score
+ * @param {string} [entry.mode]    - "1P" | "2P"
+ * @returns {{ initials:string, score:number, mode:string, date:string }}
  */
-export async function createPlayer(name) {
-  const res = await fetch(`${BASE}/api/players`, {
-    method:  "POST",
-    headers: { "Content-Type": "application/json" },
-    body:    JSON.stringify({ name })
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Error al crear jugador");
-  return data;
+export function saveScore({ initials, score, mode = "1P" }) {
+  const clean = initials.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3).padEnd(3, "A");
+  const entry = { initials: clean, score, mode, date: new Date().toISOString() };
+
+  const all = getScores();
+  all.push(entry);
+  // Mantener solo los últimos MAX_ENTRIES, ordenados por puntaje desc
+  all.sort((a, b) => b.score - a.score);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all.slice(0, MAX_ENTRIES)));
+
+  return entry;
 }
 
 /**
- * Actualiza el nombre de un jugador existente.
- * @param {string} id
- * @param {string} name
- * @returns {Promise<Object>}
+ * Devuelve el top N de puntajes, opcionalmente filtrado por modo.
+ * @param {number} [limit=20]
+ * @param {string|null} [mode]
+ * @returns {Array}
  */
-export async function updatePlayer(id, name) {
-  const res = await fetch(`${BASE}/api/players/${id}`, {
-    method:  "PUT",
-    headers: { "Content-Type": "application/json" },
-    body:    JSON.stringify({ name })
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Error al actualizar jugador");
-  return data;
+export function getTopScores(limit = 20, mode = null) {
+  let scores = getScores();
+  if (mode) scores = scores.filter(s => s.mode === mode);
+  return scores.sort((a, b) => b.score - a.score).slice(0, limit);
 }
 
 /**
- * Elimina un jugador y todos sus puntajes.
- * @param {string} id
- * @returns {Promise<Object>}
+ * Borra todas las entradas del ranking.
  */
-export async function deletePlayer(id) {
-  const res = await fetch(`${BASE}/api/players/${id}`, { method: "DELETE" });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Error al eliminar jugador");
-  return data;
-}
-
-// ─── Puntajes ──────────────────────────────────────────────────────────────
-
-/**
- * Obtiene todos los puntajes enriquecidos con el nombre del jugador.
- * @returns {Promise<Array>}
- */
-export async function fetchScores() {
-  const res = await fetch(`${BASE}/api/scores`);
-  if (!res.ok) throw new Error("Error al cargar puntajes");
-  return res.json();
-}
-
-/**
- * Guarda un puntaje nuevo al finalizar una partida.
- * @param {Object} scoreData - { playerId?, playerName, score, mode }
- * @returns {Promise<Object>}
- */
-export async function saveScore(scoreData) {
-  const res = await fetch(`${BASE}/api/scores`, {
-    method:  "POST",
-    headers: { "Content-Type": "application/json" },
-    body:    JSON.stringify(scoreData)
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Error al guardar puntaje");
-  return data;
-}
-
-/**
- * Elimina un puntaje por su ID.
- * @param {string} id
- * @returns {Promise<Object>}
- */
-export async function deleteScore(id) {
-  const res = await fetch(`${BASE}/api/scores/${id}`, { method: "DELETE" });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Error al eliminar puntaje");
-  return data;
+export function clearScores() {
+  localStorage.removeItem(STORAGE_KEY);
 }

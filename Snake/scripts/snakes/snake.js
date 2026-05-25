@@ -110,14 +110,31 @@ export class Snake {
       const cs = CELL_SIZE;
 
       if (index === 0) {
-        // Cabeza
+        // Cabeza estilo gato
         ctx.fillStyle = this.headColor;
         ctx.beginPath();
-        ctx.roundRect(px + 1, py + 1, cs - 2, cs - 2, 4);
+        ctx.roundRect(px + 1, py + 4, cs - 2, cs - 5, 6);
         ctx.fill();
 
-        // Ojos
+        // Orejas
+        const earSize = 5;
+        ctx.beginPath();
+        ctx.moveTo(px + 4, py + 4);
+        ctx.lineTo(px + 4 + earSize, py + 4);
+        ctx.lineTo(px + 4, py + 4 + earSize);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(px + cs - 4, py + 4);
+        ctx.lineTo(px + cs - 4 - earSize, py + 4);
+        ctx.lineTo(px + cs - 4, py + 4 + earSize);
+        ctx.closePath();
+        ctx.fill();
+
+        // Ojos y detalles de gato
         this._drawEyes(ctx, seg, cs);
+        this._drawCatFace(ctx, seg, cs);
       } else {
         // Cuerpo con degradado de opacidad
         const opacity = Math.max(0.4, 1 - (index / this.body.length) * 0.5);
@@ -155,5 +172,44 @@ export class Snake {
 
     ctx.beginPath(); ctx.arc(...e1, r, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(...e2, r, 0, Math.PI * 2); ctx.fill();
+  }
+
+  /**
+   * Dibuja la nariz y los bigotes del gato.
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {{ x: number, y: number }} head
+   * @param {number} cs - Tamaño de celda
+   * @private
+   */
+  _drawCatFace(ctx, head, cs) {
+    const px = head.x * cs;
+    const py = head.y * cs;
+    const noseX = px + cs / 2;
+    const noseY = py + cs / 2 + 1;
+
+    // Nariz
+    ctx.fillStyle = "#ff9da4";
+    ctx.beginPath();
+    ctx.moveTo(noseX, noseY);
+    ctx.lineTo(noseX - 2.5, noseY + 3);
+    ctx.lineTo(noseX + 2.5, noseY + 3);
+    ctx.closePath();
+    ctx.fill();
+
+    // Bigotes
+    ctx.strokeStyle = this.eyeColor;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(noseX - 3, noseY + 4);
+    ctx.lineTo(noseX - 8, noseY + 3);
+    ctx.moveTo(noseX - 3, noseY + 5);
+    ctx.lineTo(noseX - 8, noseY + 6);
+    ctx.moveTo(noseX + 3, noseY + 4);
+    ctx.lineTo(noseX + 8, noseY + 3);
+    ctx.moveTo(noseX + 3, noseY + 5);
+    ctx.lineTo(noseX + 8, noseY + 6);
+    ctx.stroke();
+
+    ctx.lineWidth = 1;
   }
 }

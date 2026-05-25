@@ -243,3 +243,34 @@
   .game-hud      { justify-content: center; }
   .mode-selector { flex-direction: column; }
 }
+/* ─── agregar al final del archivo ────────────────────────────────────────── */
+
+/* Navbar oculto durante el juego */
+.navbar--hidden {
+  display: none !important;
+}
+
+/* Cuando el juego está activo: ocupar toda la pantalla sin scroll */
+body:has(.game-area.active) .game-wrapper {
+  padding:    0.5rem 0;
+  min-height: 100vh;
+}
+
+body:has(.game-area.active) {
+  overflow: hidden;
+}
+
+/* Canvas se autoajusta a la altura disponible */
+body:has(.game-area.active) #game-canvas {
+  max-height: calc(100vh - 236px);
+  width:  auto !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1;
+}
+
+@media (max-width: 768px) {
+  body:has(.game-area.active) #game-canvas {
+    max-height: calc(100vh - 280px);
+    max-width:  100%;
+  }
+}

@@ -4,11 +4,44 @@
  */
 
 /* ─── Layout principal ───────────────────────────────────────────────────── */
+/* ─── reemplazar el .game-wrapper existente ───────────────────────────────── */
 .game-wrapper {
   padding:    1.5rem 0;
   min-height: calc(100vh - var(--navbar-height));
 }
 
+/* ─── agregar al final del archivo ────────────────────────────────────────── */
+
+/* Navbar oculto durante el juego */
+.navbar--hidden {
+  display: none !important;
+}
+
+/* Cuando el juego está activo: ocupar toda la pantalla sin scroll */
+body:has(.game-area.active) .game-wrapper {
+  padding:    0.5rem 0;
+  min-height: 100vh;
+}
+
+body:has(.game-area.active) {
+  overflow: hidden;
+}
+
+/* Canvas se autoajusta a la altura disponible */
+body:has(.game-area.active) #game-canvas {
+  /* 100vh - HUD(~80px) - dpad(~100px) - gaps(~40px) - padding(~16px) */
+  max-height: calc(100vh - 236px);
+  width:  auto !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1;
+}
+
+@media (max-width: 768px) {
+  body:has(.game-area.active) #game-canvas {
+    max-height: calc(100vh - 280px);
+    max-width:  100%;
+  }
+}
 /* ─── Panel de configuración pre-juego ──────────────────────────────────── */
 .setup-panel {
   max-width:     520px;

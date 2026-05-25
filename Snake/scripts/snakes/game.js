@@ -20,7 +20,7 @@ import { spawnEatParticles, updateParticles,
          clearParticles }                       from "./effects.js";
 import { initAudio, playEat, playGameOver,
          playLevelUp, isMuted, setMuted }       from "./sounds.js";
-import { saveScore, fetchPlayers }              from "../common/storage.js";
+import { saveScore }                             from "../common/storage.js";
 import { showToast }                            from "../common/ui.js";
 
 // ─── Estado global del juego ───────────────────────────────────────────────
@@ -295,25 +295,8 @@ async function endGame() {
     result = determineWinner(snake1.alive, snake2.alive, s1, s2);
   }
 
-  // Guardar puntajes en el servidor
-  try {
-    await saveScore({
-      playerId:   player1Data.id,
-      playerName: player1Data.name,
-      score:      s1,
-      mode:       gameMode
-    });
-    if (gameMode === "2P") {
-      await saveScore({
-        playerId:   player2Data.id,
-        playerName: player2Data.name,
-        score:      s2,
-        mode:       gameMode
-      });
-    }
-  } catch (e) {
-    console.warn("No se pudo guardar el puntaje:", e.message);
-  }
+  // La UI pedirá las iniciales y luego llamará a saveScore() directamente.
+  // Aquí solo pasamos los datos al callback onGameEnd para que lo maneje.
 
   // Notificar a la UI
   if (onGameEnd) {
