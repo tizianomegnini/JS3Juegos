@@ -1,39 +1,24 @@
-import http from 'http';
-import fs from 'fs';
+const http = require('http');
+const fs   = require('fs');
+const path = require('path');
 
-const server = http.createServer((req, res) => {
-  
+const MIME = {
+  '.html': 'text/html',
+  '.js':   'text/javascript',
+  '.css':  'text/css',
+  '.png':  'image/png',
+  '.ico':  'image/x-icon',
+};
 
-  if (req.url === '/') {
-    fs.readFile('./pages/index2.html', (err, data) => {
-      if (err) {
-        console.error(err);
-        res.end('Error HTML');
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(data);
-    });
-  }
+http.createServer((req, res) => {
+  const filePath = './public' + (req.url === '/' ? '/index.html' : req.url);
+  const ext      = path.extname(filePath);
+  const type     = MIME[ext] || 'text/plain';
 
-  else if (req.url === '/styles/style2.css') {
-    fs.readFile('./styles/style2.css', (err, data) => {
-      if (err) {
-        console.error(err);
-        res.end('Error CSS');
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': 'text/css' });
-      res.end(data);
-    });
-  }
+  fs.readFile(filePath, (err, content) => {
+    if (err) { res.writeHead(404); res.end('No encontrado'); return; }
+    res.writeHead(200, { 'Content-Type': type });
+    res.end(content);
+  });
 
-  else {
-    res.writeHead(404);
-    res.end('No encontrado');
-  }
-});
-
-server.listen(3000, () => {
-  console.log('Servidor en http://localhost:3000');
-});
+}).listen(3000, () => console.log('Servidor en http://localhost:3000'));
