@@ -6,3 +6,4 @@
 {"initials":"LOL","score":27,"mode":"1P","settings":{"mapSize":"small","foodCount":5,"wallMode":"wall"},"mapSize":"small","foodCount":5,"wallMode":"wall","date":"2026-05-28T01:48:15.690Z"}
 {"initials":"CEL","score":22,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T01:50:30.384Z"}
 {"initials":"FON","score":23,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T02:17:56.569Z"}
+{"initials":"IGT","score":41,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T16:11:55.817Z"}

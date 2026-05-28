@@ -9,7 +9,7 @@ const FOOD_TYPES = [
   { emoji: "🍎", value: 1, chance: 0.55 },
   { emoji: "🍊", value: 1, chance: 0.20 },
   { emoji: "🍇", value: 1, chance: 0.15 },
-  { emoji: "⭐", value: 2, chance: 0.10 }
+  { emoji: "⭐", value: 1, chance: 0.10 }
 ];
 
 const FOOD_IMAGE = new Image();
