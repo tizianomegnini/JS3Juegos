@@ -5,15 +5,15 @@
  */
 
 /** Tamaño de cada celda en píxeles */
-export const CELL_SIZE = 20;
+export const CELL_SIZE = 30;
 
 /** Número de celdas en cada dimensión */
-export const COLS = 30;
-export const ROWS = 30;
+export const COLS = 35;  // Más ancho
+export const ROWS = 21;  // Más corto
 
 /** Dimensiones totales del canvas en píxeles */
-export const CANVAS_WIDTH  = COLS * CELL_SIZE; // 600px
-export const CANVAS_HEIGHT = ROWS * CELL_SIZE; // 600px
+export const CANVAS_WIDTH  = COLS * CELL_SIZE; // 1050px
+export const CANVAS_HEIGHT = ROWS * CELL_SIZE; // 630px
 
 /**
  * Inicializa el canvas con las dimensiones correctas.
@@ -41,7 +41,7 @@ export function clearBoard(ctx, bgColor) {
  */
 export function drawGrid(ctx, gridColor) {
   ctx.strokeStyle = gridColor;
-  ctx.lineWidth   = 0.3;
+  ctx.lineWidth   = 1.5;
 
   for (let x = 0; x <= CANVAS_WIDTH; x += CELL_SIZE) {
     ctx.beginPath();
@@ -56,4 +56,15 @@ export function drawGrid(ctx, gridColor) {
     ctx.lineTo(CANVAS_WIDTH, y);
     ctx.stroke();
   }
+}
+
+/**
+ * Dibuja el borde exterior del tablero.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {string} borderColor - Color del borde
+ */
+export function drawBorder(ctx, borderColor) {
+  ctx.strokeStyle = borderColor;
+  ctx.lineWidth   = 3;
+  ctx.strokeRect(0.5, 0.5, CANVAS_WIDTH - 1, CANVAS_HEIGHT - 1);
 }

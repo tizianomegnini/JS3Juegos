@@ -11,6 +11,21 @@
   <!-- Estilos del proyecto -->
   <link id="global-css" rel="stylesheet" href="/styles/global-light.css" />
   <link id="page-css"   rel="stylesheet" href="/styles/game-light.css" />
+  
+  <!-- Script para evitar parpadeo: detecta el tema antes de cargar CSS -->
+  <script>
+    (function() {
+      const THEME_KEY = 'snake-theme';
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      const theme = savedTheme || 'light';
+      
+      if (theme === 'dark') {
+        document.getElementById('global-css').href = '/styles/global-dark.css';
+        document.getElementById('page-css').href = '/styles/game-dark.css';
+      }
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
 </head>
 <body>
 
@@ -89,7 +104,7 @@
 
         <!-- Canvas -->
         <div class="canvas-wrapper">
-          <canvas id="game-canvas" width="600" height="600"></canvas>
+          <canvas id="game-canvas" width="1050" height="630"></canvas>
         </div>
 
         <!-- D-pads táctiles -->
@@ -343,6 +358,26 @@ function returnToSetup() {
     // ─── Jugar de nuevo sin guardar ────────────────────────────────────────
     document.getElementById("skip-initials-btn").addEventListener("click", () => {
       bootstrap.Modal.getInstance(document.getElementById("initials-modal")).hide();
+      returnToSetup();
+    });
+
+    // ─── Botones de control del juego ──────────────────────────────────────
+    document.getElementById("pause-btn").addEventListener("click", () => {
+      if (!getIsRunning()) return;
+      togglePause();
+      const isPaused = getIsPaused();
+      document.getElementById("pause-btn").textContent = isPaused ? "▶ Reanudar" : "⏸ Pausa";
+    });
+
+    document.getElementById("mute-btn").addEventListener("click", () => {
+      toggleMute();
+      const isMuted = getMuted();
+      document.getElementById("mute-btn").textContent = isMuted ? "🔇" : "🔊";
+    });
+
+    document.getElementById("stop-btn").addEventListener("click", () => {
+      if (!getIsRunning()) return;
+      stopGame();
       returnToSetup();
     });
 

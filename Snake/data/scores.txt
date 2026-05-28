@@ -1,0 +1,7 @@
+{"initials":"IGT","score":37,"mode":"1P","date":"2026-05-26T23:20:11.936Z"}
+{"initials":"CAT","score":9,"mode":"1P","date":"2026-05-26T23:53:05.602Z"}
+{"initials":"CEL","score":16,"mode":"1P","date":"2026-05-26T23:53:11.964Z"}
+{"initials":"TRM","score":23,"mode":"1P","date":"2026-05-27T01:14:14.852Z"}
+{"initials":"IGT","score":22,"mode":"1P","date":"2026-05-27T01:17:04.077Z"}
+{"initials":"NAC","score":11,"mode":"1P","date":"2026-05-27T01:21:08.042Z"}
+{"initials":"IGT","score":65,"mode":"1P","date":"2026-05-27T18:26:37.235Z"}

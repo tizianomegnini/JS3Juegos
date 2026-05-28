@@ -1,0 +1,190 @@
+/**
+ * index-dark.css
+ * Estilos específicos de la página de inicio — modo oscuro.
+ */
+
+/* ─── Hero section ──────────────────────────────────────────────────────── */
+.hero-section {
+  min-height:      calc(100vh - var(--navbar-height));
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         3rem 1rem;
+  background:      radial-gradient(ellipse at center, #0d2a0d 0%, #0d1a0d 70%);
+}
+
+.hero-snake-icon {
+  font-size:   5rem;
+  line-height: 1;
+  animation:   float 3s ease-in-out infinite;
+  filter:      drop-shadow(0 0 20px rgba(77, 201, 77, 0.5));
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
+
+.hero-title {
+  font-family:   var(--font-pixel);
+  font-size:     2.5rem;
+  color:         var(--accent-green);
+  line-height:   1.5;
+  margin-bottom: 1rem;
+  text-shadow:   0 0 30px rgba(77, 201, 77, 0.5);
+}
+
+.hero-subtitle {
+  font-size:   1.15rem;
+  color:       var(--text-secondary);
+  font-weight: 600;
+  max-width:   500px;
+}
+
+/* ─── Sección de jugadores ───────────────────────────────────────────────── */
+.players-section {
+  padding: 3rem 0;
+}
+
+.section-title {
+  font-family:    var(--font-pixel);
+  font-size:      1.1rem;
+  color:          var(--accent-green);
+  margin-bottom:  1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom:  2px solid var(--border-color);
+  text-shadow:    0 0 12px rgba(77, 201, 77, 0.3);
+}
+
+/* ─── Lista de jugadores ─────────────────────────────────────────────────── */
+.player-item {
+  display:       flex;
+  align-items:   center;
+  gap:           0.75rem;
+  padding:       0.85rem 1rem;
+  border-radius: var(--border-radius-sm);
+  border:        1px solid var(--border-color);
+  background:    var(--bg-secondary);
+  margin-bottom: 0.5rem;
+  transition:    all var(--transition);
+}
+
+.player-item:hover {
+  border-color: var(--accent-green);
+  background:   #0d2a0d;
+  box-shadow:   0 0 12px rgba(77, 201, 77, 0.1);
+}
+
+.player-avatar {
+  width:         40px;
+  height:        40px;
+  border-radius: 50%;
+  background:    linear-gradient(135deg, var(--accent-green), var(--accent-lime));
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  font-weight:   800;
+  color:         #0d1a0d;
+  font-size:     1rem;
+  flex-shrink:   0;
+  box-shadow:    0 0 10px rgba(77, 201, 77, 0.3);
+}
+
+.player-name {
+  font-weight: 700;
+  flex:        1;
+  color:       var(--text-primary);
+}
+
+.player-date {
+  font-size:   0.78rem;
+  color:       var(--text-muted);
+  font-weight: 600;
+}
+
+.player-actions {
+  display: flex;
+  gap:     0.35rem;
+}
+
+.btn-icon {
+  width:         32px;
+  height:        32px;
+  border-radius: var(--border-radius-sm);
+  border:        none;
+  cursor:        pointer;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  font-size:     0.85rem;
+  transition:    all var(--transition);
+}
+
+.btn-icon-edit {
+  background: rgba(93, 173, 226, 0.12);
+  color:      var(--accent-blue);
+}
+
+.btn-icon-edit:hover {
+  background: var(--accent-blue);
+  color:      #0d1a0d;
+  box-shadow: 0 0 8px rgba(93, 173, 226, 0.4);
+}
+
+.btn-icon-delete {
+  background: rgba(255, 107, 107, 0.12);
+  color:      var(--accent-red);
+}
+
+.btn-icon-delete:hover {
+  background: var(--accent-red);
+  color:      #fff;
+  box-shadow: 0 0 8px rgba(255, 107, 107, 0.4);
+}
+
+/* ─── Modal de edición ──────────────────────────────────────────────────── */
+.modal-custom .modal-content {
+  background:    var(--bg-card);
+  border:        1px solid var(--border-color);
+  border-radius: var(--border-radius);
+}
+
+.modal-custom .modal-header {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-custom .modal-title {
+  font-family: var(--font-pixel);
+  font-size:   0.85rem;
+  color:       var(--accent-green);
+  text-shadow: 0 0 10px rgba(77, 201, 77, 0.4);
+}
+
+.modal-custom .btn-close {
+  filter: invert(1);
+}
+
+.modal-custom .modal-footer {
+  border-top: 1px solid var(--border-color);
+}
+
+/* ─── Empty state ────────────────────────────────────────────────────────── */
+.empty-state {
+  text-align:  center;
+  padding:     2.5rem 1rem;
+  color:       var(--text-muted);
+  font-weight: 600;
+}
+
+.empty-state .empty-icon {
+  font-size:     3rem;
+  margin-bottom: 0.75rem;
+  display:       block;
+  opacity:       0.4;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero-title     { font-size: 1.4rem; }
+  .hero-snake-icon { font-size: 3rem; }
+}

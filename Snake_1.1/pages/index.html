@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>🐍 Snake Game</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Estilos del proyecto -->
+  <link id="global-css" rel="stylesheet" href="/styles/global-light.css" />
+  <link id="page-css"   rel="stylesheet" href="/styles/index-light.css" />
+
+  <!-- Evitar parpadeo de tema -->
+  <script src="/scripts/pages/theme-loader.js"></script>
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ══════════════════════════════════════════════════════════ -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top" role="navigation" aria-label="Navegación principal">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand navbar-brand-text" href="/">🐍 SNAKE</a>
+      <button class="navbar-toggler" type="button"
+              data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false"
+              aria-label="Abrir menú">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link active" href="/">🏠 Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="/game">🎮 Jugar</a></li>
+          <li class="nav-item"><a class="nav-link" href="/ranking">🏆 Ranking</a></li>
+        </ul>
+        <button id="theme-toggle" aria-label="Cambiar tema">🌙</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═════════════════════════════════════════════════════════════ -->
+  <section class="hero-section">
+    <div class="container-fluid px-4">
+      <div class="row align-items-center justify-content-center g-5">
+
+        <!-- Texto -->
+        <div class="col-12 col-lg-6 text-center text-lg-start">
+          <div class="hero-snake-icon mb-3">🐍</div>
+          <h1 class="hero-title">SNAKE<br>GAME</h1>
+          <p class="hero-subtitle mb-4">
+            El clásico juego de la serpiente. Compite solo o con un amigo,
+            sube de nivel y domina el ranking.
+          </p>
+          <a href="/game" class="btn btn-snake btn-snake-primary btn-lg px-5 me-3">
+            🎮 Jugar ahora
+          </a>
+          <a href="/ranking" class="btn btn-snake btn-snake-outline btn-lg px-4">
+            🏆 Ver ranking
+          </a>
+        </div>
+
+        <!-- Controles -->
+        <div class="col-12 col-lg-5">
+          <div class="card-custom p-4">
+            <h3 class="section-title">🕹️ CONTROLES</h3>
+            <div class="row g-3">
+              <div class="col-6">
+                <strong class="d-block mb-1" style="color: var(--accent-green);">Jugador 1</strong>
+                <small class="d-block" style="color: var(--text-secondary);">← → ↑ ↓ Flechas</small>
+                <small class="d-block" style="color: var(--text-secondary);">o W A S D</small>
+              </div>
+              <div class="col-6">
+                <strong class="d-block mb-1" style="color: var(--accent-blue);">Jugador 2</strong>
+                <small class="d-block" style="color: var(--text-secondary);">I J K L</small>
+                <small class="d-block" style="color: var(--text-muted);">(modo 2P)</small>
+              </div>
+              <div class="col-12 border-top pt-3" style="border-color: var(--border-color) !important;">
+                <small style="color: var(--text-muted);">
+                  📱 En celular: usá el D-pad táctil en pantalla<br>
+                  ⏸ Pausa: tecla <strong>P</strong> o <strong>ESC</strong>
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SCROLL TOP ══════════════════════════════════════════════════════ -->
+  <button id="scroll-top-btn" aria-label="Volver al inicio">↑</button>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script type="module" src="/scripts/pages/index.js"></script>
+
+</body>
+</html>

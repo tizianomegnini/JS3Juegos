@@ -11,6 +11,21 @@
   <!-- Estilos del proyecto -->
   <link id="global-css" rel="stylesheet" href="/styles/global-light.css" />
   <link id="page-css"   rel="stylesheet" href="/styles/ranking-light.css" />
+  
+  <!-- Script para evitar parpadeo: detecta el tema antes de cargar CSS -->
+  <script>
+    (function() {
+      const THEME_KEY = 'snake-theme';
+      const savedTheme = localStorage.getItem(THEME_KEY);
+      const theme = savedTheme || 'light';
+      
+      if (theme === 'dark') {
+        document.getElementById('global-css').href = '/styles/global-dark.css';
+        document.getElementById('page-css').href = '/styles/ranking-dark.css';
+      }
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
 </head>
 <body>
 
@@ -121,8 +136,8 @@
     let currentMode = "";
 
     // ─── Renderizar tabla ──────────────────────────────────────────────────
-    function renderRanking() {
-      const scores = getTopScores(50, currentMode || null);
+    async function renderRanking() {
+      const scores = await getTopScores(50, currentMode || null);
       const tbody  = document.getElementById("ranking-body");
 
       if (!scores.length) {
@@ -166,13 +181,13 @@
     document.getElementById("clear-btn").addEventListener("click", async () => {
       const ok = await confirmAction("¿Borrar todo el ranking de este dispositivo?");
       if (!ok) return;
-      clearScores();
+      await clearScores();
       showToast("Ranking borrado.", "info");
-      renderRanking();
+      await renderRanking();
     });
 
     // ─── Render inicial ────────────────────────────────────────────────────
-    renderRanking();
+    await renderRanking();
   </script>
 
 </body>

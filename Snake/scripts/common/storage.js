@@ -1,60 +1,100 @@
 /**
  * storage.js
- * Módulo de acceso a localStorage.
- * Guarda entradas con { initials: "AAA", score: 999, mode: "1P", date: "ISO" }.
+ * Manejo de scores vía servidor.
  */
-
-const STORAGE_KEY = "snake-scores";
-const MAX_ENTRIES = 100;
 
 /**
- * Lee todas las entradas guardadas.
- * @returns {Array<{initials:string, score:number, mode:string, date:string}>}
+ * Obtiene todos los scores.
+ * @returns {Promise<Array>}
  */
-export function getScores() {
+export async function getScores() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-  } catch {
+    const res = await fetch("/api/scores");
+
+    if (!res.ok) {
+      return [];
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.error("Error obteniendo scores:", err);
     return [];
   }
 }
 
 /**
- * Guarda una nueva entrada de puntaje.
+ * Guarda un score nuevo.
  * @param {Object} entry
- * @param {string} entry.initials  - Exactamente 3 letras mayúsculas
+ * @param {string} entry.initials
  * @param {number} entry.score
- * @param {string} [entry.mode]    - "1P" | "2P"
- * @returns {{ initials:string, score:number, mode:string, date:string }}
+ * @param {string} [entry.mode]
+ * @returns {Promise<Object>}
  */
-export function saveScore({ initials, score, mode = "1P" }) {
-  const clean = initials.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3).padEnd(3, "A");
-  const entry = { initials: clean, score, mode, date: new Date().toISOString() };
+export async function saveScore({
+  initials,
+  score,
+  mode = "1P"
+}) {
+  const clean = initials
+    .toUpperCase()
+    .replace(/[^A-Z]/g, "")
+    .slice(0, 3)
+    .padEnd(3, "A");
 
-  const all = getScores();
-  all.push(entry);
-  // Mantener solo los últimos MAX_ENTRIES, ordenados por puntaje desc
-  all.sort((a, b) => b.score - a.score);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(all.slice(0, MAX_ENTRIES)));
+  const entry = {
+    initials: clean,
+    score,
+    mode,
+    date: new Date().toISOString()
+  };
 
-  return entry;
+  try {
+    await fetch("/api/scores", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(entry)
+    });
+
+    return entry;
+  } catch (err) {
+    console.error("Error guardando score:", err);
+    return null;
+  }
 }
 
 /**
- * Devuelve el top N de puntajes, opcionalmente filtrado por modo.
+ * Devuelve el top N de scores.
  * @param {number} [limit=20]
- * @param {string|null} [mode]
- * @returns {Array}
+ * @param {string|null} [mode=null]
+ * @returns {Promise<Array>}
  */
-export function getTopScores(limit = 20, mode = null) {
-  let scores = getScores();
-  if (mode) scores = scores.filter(s => s.mode === mode);
-  return scores.sort((a, b) => b.score - a.score).slice(0, limit);
+export async function getTopScores(
+  limit = 20,
+  mode = null
+) {
+  let scores = await getScores();
+
+  if (mode) {
+    scores = scores.filter(s => s.mode === mode);
+  }
+
+  return scores
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
 }
 
 /**
- * Borra todas las entradas del ranking.
+ * Borra todos los scores.
+ * @returns {Promise<void>}
  */
-export function clearScores() {
-  localStorage.removeItem(STORAGE_KEY);
+export async function clearScores() {
+  try {
+    await fetch("/api/scores", {
+      method: "DELETE"
+    });
+  } catch (err) {
+    console.error("Error limpiando scores:", err);
+  }
 }

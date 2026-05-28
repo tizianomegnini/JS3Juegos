@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🐍 Snake — Jugar</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link id="global-css" rel="stylesheet" href="/styles/global-light.css" />
+  <link id="page-css"   rel="stylesheet" href="/styles/game-light.css" />
+  <script>
+    (function() {
+      const t = localStorage.getItem("snake-theme") || "light";
+      if (t === "dark") {
+        document.getElementById("global-css").href = "/styles/global-dark.css";
+        document.getElementById("page-css").href   = "/styles/game-dark.css";
+      }
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+
+  <style>
+    /* ── Paneles de controles in-game ────────────────────────────────────── */
+    .game-play-row {
+      display:         flex;
+      align-items:     center;
+      justify-content: center;
+      gap:             1rem;
+      width:           100%;
+    }
+
+    .controls-panel {
+      display:        flex;
+      flex-direction: column;
+      align-items:    center;
+      gap:            0.75rem;
+      padding:        0.9rem 0.7rem;
+      background:     var(--bg-card);
+      border:         1px solid var(--border-color);
+      border-radius:  var(--border-radius-sm);
+      min-width:      88px;
+      flex-shrink:    0;
+    }
+
+    .controls-panel-title {
+      font-size:      0.65rem;
+      font-weight:    800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .controls-panel-title.p1 { color: var(--accent-green); }
+    .controls-panel-title.p2 { color: var(--accent-blue);  }
+
+    .kbd-group {
+      display:        flex;
+      flex-direction: column;
+      align-items:    center;
+      gap:            4px;
+    }
+    .kbd-row {
+      display: flex;
+      gap:     4px;
+    }
+    kbd.k {
+      display:         inline-flex;
+      align-items:     center;
+      justify-content: center;
+      width:           32px;
+      height:          32px;
+      border:          2px solid var(--border-color);
+      border-bottom-width: 4px;
+      border-radius:   5px;
+      background:      var(--bg-secondary);
+      color:           var(--text-secondary);
+      font-family:     var(--font-body);
+      font-weight:     800;
+      font-size:       0.75rem;
+      line-height:     1;
+      flex-shrink:     0;
+    }
+    .kbd-divider {
+      font-size:  0.6rem;
+      color:      var(--text-muted);
+      text-align: center;
+    }
+
+    /* En mobile se ocultan (usan dpad) */
+    @media (max-width: 768px) {
+      .controls-panel { display: none !important; }
+      .game-play-row  { flex-direction: column; }
+    }
+    @media (max-width: 900px) and (orientation: landscape) {
+      .controls-panel { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top" role="navigation">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand navbar-brand-text" href="/">🐍 SNAKE</a>
+      <button class="navbar-toggler" type="button"
+              data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menú">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="/">🏠 Inicio</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/game">🎮 Jugar</a></li>
+          <li class="nav-item"><a class="nav-link" href="/ranking">🏆 Ranking</a></li>
+        </ul>
+        <button id="theme-toggle" aria-label="Cambiar tema">🌙</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="game-wrapper">
+    <div class="container-fluid px-4">
+
+      <!-- ── SETUP PANEL ──────────────────────────────────────────────── -->
+      <div id="setup-panel" class="setup-panel">
+        <h1 class="setup-title">🎮 CONFIGURAR PARTIDA</h1>
+
+        <div class="setup-section-label">Modo de juego</div>
+        <div class="mode-selector">
+          <button class="mode-btn active" data-mode="1P">
+            <span class="mode-icon">👤</span>
+            <span class="mode-label">1 JUGADOR</span>
+          </button>
+          <button class="mode-btn" data-mode="2P">
+            <span class="mode-icon">👥</span>
+            <span class="mode-label">2 JUGADORES</span>
+          </button>
+        </div>
+
+        <div class="setup-options-grid">
+
+          <!-- Tamaño del mapa -->
+          <div>
+            <div class="setup-section-label">Tamaño del mapa</div>
+            <div class="option-selector" id="map-selector">
+              <button class="option-btn" data-value="small">
+                <span class="option-icon">🗺️</span>
+                <span class="option-label">Pequeño</span>
+                <span class="option-sub">20×12</span>
+              </button>
+              <button class="option-btn active" data-value="medium">
+                <span class="option-icon">🗺️</span>
+                <span class="option-label">Mediano</span>
+                <span class="option-sub">28×17</span>
+              </button>
+              <button class="option-btn" data-value="large">
+                <span class="option-icon">🗺️</span>
+                <span class="option-label">Grande</span>
+                <span class="option-sub">35×21</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Frutas en juego -->
+          <div>
+            <div class="setup-section-label">Frutas en juego</div>
+            <div class="option-selector" id="food-selector">
+              <button class="option-btn active" data-value="1">
+                <span class="option-icon">🍎</span>
+                <span class="option-label">1 fruta</span>
+              </button>
+              <button class="option-btn" data-value="3">
+                <span class="option-icon">🍎🍊🍇</span>
+                <span class="option-label">3 frutas</span>
+              </button>
+              <button class="option-btn" data-value="5">
+                <span class="option-icon">🍎🍊🍇⭐🍇</span>
+                <span class="option-label">5 frutas</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Paredes -->
+          <div>
+            <div class="setup-section-label">Paredes</div>
+            <div class="option-selector" id="wall-selector">
+              <button class="option-btn active" data-value="wall">
+                <span class="option-icon">🧱</span>
+                <span class="option-label">Morir</span>
+                <span class="option-sub">Chocás = Game Over</span>
+              </button>
+              <button class="option-btn" data-value="wrap">
+                <span class="option-icon">🌀</span>
+                <span class="option-label">Atravesar</span>
+                <span class="option-sub">Salís del otro lado</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Botón start (ocupa ambas columnas) -->
+          <button id="start-btn" class="btn btn-snake btn-snake-primary">
+            ▶ INICIAR PARTIDA
+          </button>
+
+        </div>
+      </div>
+
+      <!-- ── ÁREA DE JUEGO ──────────────────────────────────────────────── -->
+      <div id="game-area" class="game-area">
+
+        <!-- HUD -->
+        <div class="game-hud">
+          <div class="score-box">
+            <span class="score-label">🟢 JUGADOR 1</span>
+            <span class="score-value" id="score-p1">0</span>
+            <small class="score-label" id="level-p1">NIV 1</small>
+          </div>
+
+          <div style="text-align:center;">
+            <div class="score-value" id="timer-display" style="font-size:1rem;">00:00</div>
+            <div class="d-flex gap-2 justify-content-center mt-1">
+              <button id="pause-btn" class="btn btn-snake btn-snake-outline btn-sm">⏸ Pausa</button>
+              <button id="mute-btn"  class="btn btn-snake btn-snake-outline btn-sm">🔊</button>
+              <button id="stop-btn"  class="btn btn-snake btn-snake-danger btn-sm">⏹</button>
+            </div>
+          </div>
+
+          <div class="score-box p2" id="score-box-p2" style="display:none;">
+            <span class="score-label">🔵 JUGADOR 2</span>
+            <span class="score-value" id="score-p2">0</span>
+            <small class="score-label" id="level-p2">NIV 1</small>
+          </div>
+        </div>
+
+        <!-- Fila principal: controles izq | canvas | controles der -->
+        <div class="game-play-row">
+
+          <!-- Panel J1 (siempre visible en desktop) -->
+          <div class="controls-panel" id="controls-p1">
+            <span class="controls-panel-title p1">J1</span>
+            <div class="kbd-group">
+              <div class="kbd-row"><kbd class="k">W</kbd></div>
+              <div class="kbd-row">
+                <kbd class="k">A</kbd><kbd class="k">S</kbd><kbd class="k">D</kbd>
+              </div>
+            </div>
+            <div class="kbd-divider">o</div>
+            <div class="kbd-group">
+              <div class="kbd-row"><kbd class="k">↑</kbd></div>
+              <div class="kbd-row">
+                <kbd class="k">←</kbd><kbd class="k">↓</kbd><kbd class="k">→</kbd>
+              </div>
+            </div>
+          </div>
+
+          <!-- Canvas -->
+          <div class="canvas-wrapper">
+            <canvas id="game-canvas" width="1050" height="630"></canvas>
+          </div>
+
+          <!-- Panel J2 (solo modo 2P) -->
+          <div class="controls-panel" id="controls-p2" style="display:none;">
+            <span class="controls-panel-title p2">J2</span>
+            <div class="kbd-group">
+              <div class="kbd-row"><kbd class="k">I</kbd></div>
+              <div class="kbd-row">
+                <kbd class="k">J</kbd><kbd class="k">K</kbd><kbd class="k">L</kbd>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- D-pads táctiles (mobile) -->
+        <div class="dpad-section">
+          <div class="dpad-container" id="dpad-p1">
+            <div class="dpad-row"><button class="dpad-btn" data-dir="UP">▲</button></div>
+            <div class="dpad-row">
+              <button class="dpad-btn" data-dir="LEFT">◄</button>
+              <button class="dpad-btn" data-dir="DOWN">▼</button>
+              <button class="dpad-btn" data-dir="RIGHT">►</button>
+            </div>
+            <div class="dpad-label">J1</div>
+          </div>
+          <div class="dpad-container" id="dpad-p2" style="display:none;">
+            <div class="dpad-row"><button class="dpad-btn" data-dir="UP">▲</button></div>
+            <div class="dpad-row">
+              <button class="dpad-btn" data-dir="LEFT">◄</button>
+              <button class="dpad-btn" data-dir="DOWN">▼</button>
+              <button class="dpad-btn" data-dir="RIGHT">►</button>
+            </div>
+            <div class="dpad-label">J2</div>
+          </div>
+        </div>
+
+      </div><!-- /game-area -->
+    </div>
+  </main>
+
+  <!-- MODAL INICIALES -->
+  <div class="modal fade modal-custom" id="initials-modal" tabindex="-1"
+       aria-labelledby="initials-modal-label" aria-hidden="true"
+       data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="initials-modal-label">🏆 FIN DE PARTIDA</h5>
+        </div>
+        <div class="modal-body text-center">
+          <div id="end-result-msg" class="mb-3 end-result-msg"></div>
+
+          <div id="initials-block-p1" class="mb-3">
+            <label class="form-label-custom mb-1">🟢 Jugador 1 — Tus iniciales:</label>
+            <input type="text" id="initials-p1" class="form-control-custom text-center initials-input"
+                   maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA" />
+            <div id="initials-p1-error" class="field-error" role="alert"></div>
+          </div>
+
+          <div id="initials-block-p2" class="mb-2" style="display:none;">
+            <label class="form-label-custom mb-1">🔵 Jugador 2 — Tus iniciales:</label>
+            <input type="text" id="initials-p2" class="form-control-custom text-center initials-input"
+                   maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA" />
+            <div id="initials-p2-error" class="field-error" role="alert"></div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button id="save-initials-btn" class="btn btn-snake btn-snake-primary w-100">
+            💾 GUARDAR Y VER RANKING
+          </button>
+          <button id="skip-initials-btn" class="btn btn-snake btn-snake-outline w-100 mt-2">
+            🔁 Jugar de nuevo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button id="scroll-top-btn" aria-label="Volver al inicio">↑</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../scripts/pages/game.js">
+   
+  </script>
+</body>
+</html>

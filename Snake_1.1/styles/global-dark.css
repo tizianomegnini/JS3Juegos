@@ -1,0 +1,359 @@
+/**
+ * global-dark.css
+ * Variables y estilos base para el modo oscuro.
+ * Reemplaza las variables de global-light.css cuando se activa el tema oscuro.
+ */
+
+/* ─── Google Fonts ─────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap');
+
+/* ─── Variables globales modo oscuro ───────────────────────────────────── */
+:root {
+  /* Paleta oscura */
+  --bg-primary:      #0d1a0d;
+  --bg-secondary:    #122012;
+  --bg-card:         #1a2e1a;
+  --bg-navbar:       #081208;
+
+  --text-primary:    #e8f5e8;
+  --text-secondary:  #9cc49c;
+  --text-muted:      #5a8a5a;
+  --text-navbar:     #d0ead0;
+
+  --accent-green:    #4dc94d;
+  --accent-lime:     #a0e040;
+  --accent-yellow:   #f5c842;
+  --accent-red:      #ff6b6b;
+  --accent-blue:     #5dade2;
+
+  --border-color:    #2a4a2a;
+  --border-focus:    #4dc94d;
+  --shadow:          0 4px 20px rgba(77, 201, 77, 0.15);
+  --shadow-hover:    0 8px 32px rgba(77, 201, 77, 0.28);
+  --shadow-card:     0 2px 12px rgba(0, 0, 0, 0.5);
+
+  --input-bg:        #122012;
+  --input-border:    #2a4a2a;
+  --input-text:      #e8f5e8;
+
+  --error-color:     #ff6b6b;
+  --error-bg:        #2a1a1a;
+  --success-color:   #4dc94d;
+  --success-bg:      #0d220d;
+
+  /* Tipografía */
+  --font-pixel:      'Press Start 2P', monospace;
+  --font-body:       'Nunito', sans-serif;
+
+  /* Tamaños */
+  --navbar-height:   64px;
+  --border-radius:   12px;
+  --border-radius-sm: 8px;
+  --transition:      0.2s ease;
+}
+
+/* ─── Reset y base ──────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family:      var(--font-body);
+  background-color: var(--bg-primary);
+  color:            var(--text-primary);
+  min-height:       100vh;
+  line-height:      1.6;
+}
+
+/* ─── Patrón de fondo animado ───────────────────────────────────────────── */
+body::before {
+  content:    '';
+  position:   fixed;
+  inset:      0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 30px,
+    rgba(77, 201, 77, 0.025) 30px,
+    rgba(77, 201, 77, 0.025) 31px
+  ),
+  repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 30px,
+    rgba(77, 201, 77, 0.025) 30px,
+    rgba(77, 201, 77, 0.025) 31px
+  );
+  pointer-events: none;
+  z-index:        0;
+}
+
+body > * {
+  position: relative;
+  z-index:  1;
+}
+
+/* ─── Navbar ────────────────────────────────────────────────────────────── */
+.navbar-custom {
+  background-color: var(--bg-navbar) !important;
+  min-height:       var(--navbar-height);
+  border-bottom:    3px solid var(--accent-green);
+  box-shadow:       0 2px 16px rgba(77, 201, 77, 0.2);
+}
+
+.navbar-brand-text {
+  font-family:    var(--font-pixel);
+  font-size:      0.85rem;
+  color:          var(--accent-lime) !important;
+  letter-spacing: 1px;
+  text-shadow:    0 0 12px var(--accent-lime);
+}
+
+.navbar-custom .nav-link {
+  color:       var(--text-navbar) !important;
+  font-weight: 700;
+  font-size:   0.95rem;
+  transition:  color var(--transition);
+  padding:     0.5rem 1rem;
+  border-radius: var(--border-radius-sm);
+}
+
+.navbar-custom .nav-link:hover,
+.navbar-custom .nav-link.active {
+  color:            var(--accent-lime) !important;
+  background-color: rgba(160, 224, 64, 0.1);
+  text-shadow:      0 0 8px var(--accent-lime);
+}
+
+.navbar-toggler {
+  border-color: var(--accent-lime) !important;
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23a0e040' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+/* ─── Theme toggle ──────────────────────────────────────────────────────── */
+#theme-toggle {
+  background:    transparent;
+  border:        2px solid var(--accent-lime);
+  border-radius: 50%;
+  width:         38px;
+  height:        38px;
+  cursor:        pointer;
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  transition:    all var(--transition);
+  font-size:     1.1rem;
+}
+
+#theme-toggle:hover {
+  background:  var(--accent-lime);
+  box-shadow:  0 0 12px var(--accent-lime);
+}
+
+/* ─── Cards ─────────────────────────────────────────────────────────────── */
+.card-custom {
+  background:    var(--bg-card);
+  border:        1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow:    var(--shadow-card);
+  transition:    box-shadow var(--transition), transform var(--transition);
+}
+
+.card-custom:hover {
+  box-shadow: var(--shadow-hover);
+  transform:  translateY(-2px);
+}
+
+/* ─── Botones ────────────────────────────────────────────────────────────── */
+.btn-snake {
+  font-family:   var(--font-body);
+  font-weight:   800;
+  border-radius: var(--border-radius-sm);
+  transition:    all var(--transition);
+  border:        2px solid transparent;
+}
+
+.btn-snake-primary {
+  background:    var(--accent-green);
+  color:         #0d1a0d;
+  border-color:  var(--accent-green);
+}
+
+.btn-snake-primary:hover {
+  background:    #3dbd3d;
+  transform:     translateY(-1px);
+  box-shadow:    0 0 16px rgba(77, 201, 77, 0.4);
+}
+
+.btn-snake-outline {
+  background:    transparent;
+  color:         var(--accent-green);
+  border-color:  var(--accent-green);
+}
+
+.btn-snake-outline:hover {
+  background:    var(--accent-green);
+  color:         #0d1a0d;
+  box-shadow:    0 0 12px rgba(77, 201, 77, 0.3);
+}
+
+.btn-snake-danger {
+  background:    var(--accent-red);
+  color:         #fff;
+  border-color:  var(--accent-red);
+}
+
+.btn-snake-danger:hover {
+  background:    #ff5252;
+  box-shadow:    0 0 12px rgba(255, 107, 107, 0.3);
+}
+
+/* ─── Formularios ────────────────────────────────────────────────────────── */
+.form-label-custom {
+  font-weight:   700;
+  color:         var(--text-secondary);
+  margin-bottom: 0.35rem;
+  font-size:     0.9rem;
+}
+
+.form-control-custom {
+  background:    var(--input-bg);
+  border:        2px solid var(--input-border);
+  border-radius: var(--border-radius-sm);
+  color:         var(--input-text);
+  font-family:   var(--font-body);
+  font-size:     1rem;
+  padding:       0.55rem 0.9rem;
+  transition:    border-color var(--transition), box-shadow var(--transition);
+  width:         100%;
+}
+
+.form-control-custom:focus {
+  outline:      none;
+  border-color: var(--border-focus);
+  box-shadow:   0 0 0 3px rgba(77, 201, 77, 0.2);
+  background:   #0d1a0d;
+}
+
+.form-control-custom.is-invalid {
+  border-color: var(--error-color);
+  background:   var(--error-bg);
+}
+
+.form-control-custom.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+.form-control-custom.is-valid {
+  border-color: var(--success-color);
+}
+
+.field-error {
+  color:       var(--error-color);
+  font-size:   0.82rem;
+  font-weight: 600;
+  margin-top:  0.3rem;
+  display:     none;
+}
+
+.field-error.visible {
+  display: block;
+}
+
+/* ─── Scroll-to-top ─────────────────────────────────────────────────────── */
+#scroll-top-btn {
+  position:      fixed;
+  bottom:        2rem;
+  right:         2rem;
+  width:         48px;
+  height:        48px;
+  border-radius: 50%;
+  background:    var(--accent-green);
+  color:         #0d1a0d;
+  border:        none;
+  font-size:     1.3rem;
+  cursor:        pointer;
+  box-shadow:    var(--shadow);
+  display:       none;
+  align-items:   center;
+  justify-content: center;
+  z-index:       999;
+  transition:    all var(--transition);
+}
+
+#scroll-top-btn.visible {
+  display: flex;
+}
+
+#scroll-top-btn:hover {
+  transform:  scale(1.1);
+  box-shadow: 0 0 20px rgba(77, 201, 77, 0.5);
+}
+
+/* ─── Badges modo juego ──────────────────────────────────────────────────── */
+.badge-mode {
+  font-size:     0.75rem;
+  padding:       0.3em 0.7em;
+  border-radius: 999px;
+  font-weight:   700;
+}
+
+.badge-1p { background: var(--accent-blue);   color: #0d1a0d; }
+.badge-2p { background: var(--accent-yellow); color: #0d1a0d; }
+
+/* ─── Pixel title ────────────────────────────────────────────────────────── */
+.pixel-title {
+  font-family: var(--font-pixel);
+  color:       var(--accent-green);
+  line-height: 1.6;
+  text-shadow: 0 0 20px rgba(77, 201, 77, 0.4);
+}
+
+/* ─── Toast ─────────────────────────────────────────────────────────────── */
+.toast-container-custom {
+  position: fixed;
+  top:      80px;
+  right:    1.5rem;
+  z-index:  1100;
+  display:  flex;
+  flex-direction: column;
+  gap:      0.5rem;
+}
+
+.toast-custom {
+  padding:       0.8rem 1.2rem;
+  border-radius: var(--border-radius-sm);
+  font-weight:   700;
+  font-size:     0.9rem;
+  box-shadow:    var(--shadow);
+  animation:     toast-in 0.3s ease;
+  max-width:     320px;
+}
+
+.toast-custom.success { background: var(--success-bg); color: var(--success-color); border-left: 4px solid var(--success-color); }
+.toast-custom.error   { background: var(--error-bg);   color: var(--error-color);   border-left: 4px solid var(--error-color);   }
+.toast-custom.info    { background: #0d1a2d;            color: var(--accent-blue);   border-left: 4px solid var(--accent-blue); }
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Glow effects ───────────────────────────────────────────────────────── */
+.glow-green {
+  text-shadow: 0 0 10px var(--accent-green), 0 0 20px rgba(77, 201, 77, 0.4);
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .pixel-title { font-size: 1rem; }
+}

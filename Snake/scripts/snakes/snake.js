@@ -21,6 +21,7 @@ export class Snake {
    */
   constructor({ startX, startY, direction, color, headColor, eyeColor }) {
     this.body      = [{ x: startX, y: startY }];
+    this.prevBody  = [{ x: startX, y: startY }];
     this.direction = direction;
     this.nextDir   = direction;
     this.color     = color;
@@ -47,6 +48,7 @@ export class Snake {
    * @returns {{ x: number, y: number }} - Nueva posición de la cabeza
    */
   move() {
+    this.prevBody = this.body.map(seg => ({ ...seg }));
     this.direction = this.nextDir;
     const head = this.body[0];
 

@@ -6,24 +6,28 @@
 
 import { COLS, ROWS, CELL_SIZE } from "./board.js";
 
-/** Tipos de comida con su valor y emoji */
+/** Tipos de comida con su valor y probabilidad */
 const FOOD_TYPES = [
-  { emoji: "🍎", value: 1,  chance: 0.65 },
-  { emoji: "🍊", value: 2,  chance: 0.20 },
-  { emoji: "🍇", value: 3,  chance: 0.10 },
-  { emoji: "⭐", value: 5,  chance: 0.05 }
+  { emoji: "🍎", value: 1, chance: 0.65 },
+  { emoji: "🍊", value: 1, chance: 0.20 },
+  { emoji: "🍇", value: 1, chance: 0.10 },
+  { emoji: "⭐", value: 1, chance: 0.05 }
 ];
+
+/** Imagen personalizada de la comida */
+const FOOD_IMAGE = new Image();
+FOOD_IMAGE.src = "./assets/food.png";
 
 /**
  * Clase Food — representa una pieza de comida en el tablero.
  */
 export class Food {
   /**
-   * @param {Array<{ x: number, y: number }>} occupiedCells - Celdas ya ocupadas (por serpientes)
+   * @param {Array<{ x: number, y: number }>} occupiedCells
    */
   constructor(occupiedCells = []) {
     this.position = this._spawn(occupiedCells);
-    this.type     = this._pickType();
+    this.type = this._pickType();
   }
 
   /**
@@ -32,7 +36,7 @@ export class Food {
    */
   respawn(occupiedCells) {
     this.position = this._spawn(occupiedCells);
-    this.type     = this._pickType();
+    this.type = this._pickType();
   }
 
   /**
@@ -42,11 +46,16 @@ export class Food {
    */
   _pickType() {
     const rand = Math.random();
-    let   acc  = 0;
+    let acc = 0;
+
     for (const t of FOOD_TYPES) {
       acc += t.chance;
-      if (rand < acc) return t;
+
+      if (rand < acc) {
+        return t;
+      }
     }
+
     return FOOD_TYPES[0];
   }
 
@@ -59,15 +68,31 @@ export class Food {
   _spawn(occupied) {
     let pos;
     let attempts = 0;
+    const maxAttempts = 300;
+
     do {
       pos = {
         x: Math.floor(Math.random() * COLS),
         y: Math.floor(Math.random() * ROWS)
       };
+
       attempts++;
     } while (
-      occupied.some(o => o.x === pos.x && o.y === pos.y) && attempts < 200
+      occupied.some(o => o.x === pos.x && o.y === pos.y) &&
+      attempts < maxAttempts
     );
+
+    // Fuerza bruta si el tablero está muy lleno
+    if (attempts >= maxAttempts) {
+      for (let x = 0; x < COLS; x++) {
+        for (let y = 0; y < ROWS; y++) {
+          if (!occupied.some(o => o.x === x && o.y === y)) {
+            return { x, y };
+          }
+        }
+      }
+    }
+
     return pos;
   }
 
@@ -80,9 +105,12 @@ export class Food {
     const py = this.position.y * CELL_SIZE;
     const cs = CELL_SIZE;
 
-    ctx.font      = `${cs - 2}px serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(this.type.emoji, px + cs / 2, py + cs / 2);
+    ctx.drawImage(
+      FOOD_IMAGE,
+      px,
+      py,
+      cs,
+      cs
+    );
   }
 }
