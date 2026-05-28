@@ -46,7 +46,7 @@ const MAPS = [
     [1,1,1,1,2,1,0,1,1,1,1,1,0,1,2,1,1,1,1],
     [1,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,1],
     [1,2,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,2,1],
-    [1,3,2,2,2,2,2,2,2,0,2,2,2,2,2,2,2,3,1],
+    [1,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1],
     [1,1,2,1,1,1,2,1,1,1,1,1,2,1,1,1,2,1,1],
     [1,2,2,2,2,2,2,1,1,1,1,1,2,2,2,2,2,2,1],
     [1,2,1,1,1,1,2,2,2,1,2,2,2,1,1,1,1,2,1],
@@ -100,7 +100,7 @@ const MAPS = [
     [1,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,1],
     [1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1],
     [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-    [1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
   ],
   // NIVEL 5 (Mínimos muros, alto riesgo)
@@ -201,7 +201,7 @@ function cloneMap(){
 }
 function countDots(m){let c=0;for(const r of m)for(const v of r)if(v===2||v===3)c++;return c;}
 function wrap(v,max){return((v%max)+max)%max;}
-function getTile(x,y){const tx=wrap(Math.round(x),COLS),ty=wrap(Math.round(y),ROWS);return{tx,ty,value:map[ty]?.[tx]??1};}
+function getTile(x,y){const tx=wrap(Math.floor(x+0.5),COLS),ty=wrap(Math.floor(y+0.5),ROWS);return{tx,ty,value:map[ty]?.[tx]??1};}
 function isWalkable(x,y,fg=false){const{value}=getTile(x,y);return fg?value!==1:value!==1&&value!==4;}
 function canStep(e,d,fg=false){return isWalkable(e.x+d.x,e.y+d.y,fg);}
 function isCentered(e,tol=0.12){return Math.abs(e.x-Math.round(e.x))<tol&&Math.abs(e.y-Math.round(e.y))<tol;}
@@ -541,4 +541,4 @@ function startGame(){
 
 document.getElementById('playBtn').addEventListener('click',startGame);
 document.getElementById('goBtn').addEventListener('click',startGame);
-document.getElementById('winBtn').addEventListener('click',startGame);
+document.getElementById('winBtn').addEventListener('click',startGame);document.getElementById('pauseOverlay').addEventListener('click', togglePause);
