@@ -365,3 +365,36 @@ body:has(.game-area.active) .container-fluid { height: 100%; }
   }
   .dpad-label { display: none; }
 }
+/* ─────────────────────────────────────────────
+   D-PADS SOLO EN MOBILE
+───────────────────────────────────────────── */
+
+@media (min-width: 769px) {
+
+  .dpad-section,
+  #dpad-p1,
+  #dpad-p2 {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .dpad-section {
+    display: flex !important;
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  #dpad-p1 {
+    display: flex !important;
+  }
+
+  #dpad-p2[style*="display: none"] {
+    display: none !important;
+  }
+
+  #dpad-p2:not([style*="display: none"]) {
+    display: flex !important;
+  }
+}
