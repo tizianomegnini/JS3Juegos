@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🐍 Snake — Jugar</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link id="global-css" rel="stylesheet" href="/styles/global-light.css" />
-  <link id="page-css"   rel="stylesheet" href="/styles/game-light.css" />
+  <link id="global-css" rel="stylesheet" href="/styles/global-light.css?v=20260528-9" />
+  <link id="page-css"   rel="stylesheet" href="/styles/game-light.css?v=20260528-9" />
   <script>
     (function() {
+      const v = "20260528-9";
       const t = localStorage.getItem("snake-theme") || "light";
       if (t === "dark") {
-        document.getElementById("global-css").href = "/styles/global-dark.css";
-        document.getElementById("page-css").href   = "/styles/game-dark.css";
+        document.getElementById("global-css").href = `/styles/global-dark.css?v=${v}`;
+        document.getElementById("page-css").href   = `/styles/game-dark.css?v=${v}`;
       }
       document.documentElement.dataset.theme = t;
     })();
@@ -144,17 +145,17 @@
               <button class="option-btn" data-value="small">
                 <span class="option-icon">🗺️</span>
                 <span class="option-label">Pequeño</span>
-                <span class="option-sub">20×12</span>
+                <span class="option-sub">24×14</span>
               </button>
               <button class="option-btn active" data-value="medium">
                 <span class="option-icon">🗺️</span>
                 <span class="option-label">Mediano</span>
-                <span class="option-sub">28×17</span>
+                <span class="option-sub">32×19</span>
               </button>
               <button class="option-btn" data-value="large">
                 <span class="option-icon">🗺️</span>
                 <span class="option-label">Grande</span>
-                <span class="option-sub">35×21</span>
+                <span class="option-sub">42×25</span>
               </button>
             </div>
           </div>
@@ -336,7 +337,7 @@
   <button id="scroll-top-btn" aria-label="Volver al inicio">↑</button>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script type="module" src="../scripts/pages/game.js">
+  <script type="module" src="../scripts/pages/game.js?v=20260528-9">
    
   </script>
 </body>

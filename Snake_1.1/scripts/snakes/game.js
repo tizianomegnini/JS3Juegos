@@ -44,7 +44,6 @@ import {
   initAudio,
   playEat,
   playGameOver,
-  playLevelUp,
   isMuted,
   setMuted
 } from "./sounds.js";
@@ -166,6 +165,7 @@ export function startGame() {
 
     if (dpad2) {
       dpad2.style.display = "none";
+      dpad2.classList.remove("is-enabled");
     }
   }
 
@@ -230,6 +230,7 @@ export function startGame() {
   if (snake2 && dpad2) {
 
     dpad2.style.display = "flex";
+    dpad2.classList.add("is-enabled");
 
     registerDpadControls(
 
@@ -431,8 +432,7 @@ function eatFood(
 
   snake.grow();
 
-  const leveled =
-    scoreManager.addPoints(foodValue);
+  scoreManager.addPoints(foodValue);
 
   const occupied =
     getAllOccupied(snake1, snake2);
@@ -444,10 +444,6 @@ function eatFood(
 
   if (!isMuted()) {
     playEat();
-  }
-
-  if (leveled && !isMuted()) {
-    playLevelUp();
   }
 
   const color =
@@ -475,11 +471,6 @@ function eatFood(
       level1: score1Manager.level,
       level2: score2Manager.level
     });
-  }
-
-  if (leveled) {
-    tickSpeed =
-      score1Manager.getSpeed();
   }
 }
 

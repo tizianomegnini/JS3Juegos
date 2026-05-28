@@ -8,12 +8,12 @@ import { COLS, ROWS, CELL_SIZE } from "./board.js";
 const FOOD_TYPES = [
   { emoji: "🍎", value: 1, chance: 0.55 },
   { emoji: "🍊", value: 1, chance: 0.20 },
-  { emoji: "🍇", value: 1, chance: 0.15 },
-  { emoji: "⭐", value: 1, chance: 0.10 }
+  { emoji: "", value: 1, chance: 0.15 },
+  { emoji: "🎺", value: 1, chance: 0.10 }
 ];
 
 const FOOD_IMAGE = new Image();
-FOOD_IMAGE.src = "./assets/food.png";
+FOOD_IMAGE.src = "./assets/pez.gif";
 
 /** Una sola pieza de comida */
 class FoodItem {

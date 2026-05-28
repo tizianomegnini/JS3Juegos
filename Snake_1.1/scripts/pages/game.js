@@ -39,15 +39,50 @@
     setupSelector("food-selector", v => { selectedFood = parseInt(v); });
     setupSelector("wall-selector", v => { selectedWall = v; });
 
+    function applyGameUiState() {
+      const is2P = selectedMode === "2P";
+      const dpad2 = document.getElementById("dpad-p2");
+
+      document.body.classList.toggle(
+        "game-active",
+        getIsRunning() || document.getElementById("game-area").classList.contains("active")
+      );
+      document.body.dataset.mapSize = selectedMap;
+      document.getElementById("score-box-p2").style.display = is2P ? "" : "none";
+      document.getElementById("controls-p2").style.display = is2P ? "" : "none";
+      dpad2.style.display = is2P ? "" : "none";
+      dpad2.classList.toggle("is-enabled", is2P);
+    }
+
+    function validateMobileGameLayout() {
+      if (!getIsRunning()) return;
+
+      document.documentElement.style.setProperty("--vh", `${window.innerHeight * 0.01}px`);
+      applyGameUiState();
+
+      const gameArea = document.getElementById("game-area");
+      const canvas = document.getElementById("game-canvas");
+      gameArea.classList.add("active");
+
+      // Fuerza una segunda pasada de layout en móviles después de fullscreen/orientación.
+      gameArea.getBoundingClientRect();
+      canvas.getBoundingClientRect();
+    }
+
+    function scheduleMobileLayoutValidation() {
+      requestAnimationFrame(validateMobileGameLayout);
+      [80, 250, 600].forEach(delay => {
+        setTimeout(validateMobileGameLayout, delay);
+      });
+    }
+
     document.getElementById("start-btn").addEventListener("click", () => {
       document.getElementById("setup-panel").style.display = "none";
       document.getElementById("game-area").classList.add("active");
+      document.body.classList.add("game-active");
       document.querySelector("nav.navbar").classList.add("navbar--hidden");
 
-      const is2P = selectedMode === "2P";
-      document.getElementById("score-box-p2").style.display  = is2P ? "" : "none";
-      document.getElementById("dpad-p2").style.display        = is2P ? "" : "none";
-      document.getElementById("controls-p2").style.display    = is2P ? "" : "none";
+      applyGameUiState();
 
       const canvas = document.getElementById("game-canvas");
       initGame(canvas, {
@@ -60,10 +95,13 @@
         onTimer:   t => { document.getElementById("timer-display").textContent = t; }
       });
       startGame();
+      scheduleMobileLayoutValidation();
     });
 
     function returnToSetup() {
       document.querySelector("nav.navbar").classList.remove("navbar--hidden");
+      document.body.classList.remove("game-active");
+      delete document.body.dataset.mapSize;
       document.getElementById("game-area").classList.remove("active");
       document.getElementById("setup-panel").style.display = "";
       ["score-p1","score-p2"].forEach(id => document.getElementById(id).textContent = "0");
@@ -71,6 +109,9 @@
       document.getElementById("timer-display").textContent = "00:00";
       document.getElementById("pause-btn").textContent = "⏸ Pausa";
     }
+
+    window.addEventListener("resize", validateMobileGameLayout);
+    window.addEventListener("orientationchange", scheduleMobileLayoutValidation);
 
     function handleScoreUpdate({ score1, score2, level1, level2 }) {
       document.getElementById("score-p1").textContent = score1;

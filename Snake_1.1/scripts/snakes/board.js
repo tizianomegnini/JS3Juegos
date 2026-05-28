@@ -8,9 +8,9 @@ export const CELL_SIZE = 30;
 
 /** Definición de tamaños disponibles */
 export const MAP_SIZES = {
-  small:  { cols: 20, rows: 12 },   // 600×360
-  medium: { cols: 28, rows: 17 },   // 840×510
-  large:  { cols: 35, rows: 21 }    // 1050×630 (original)
+  small:  { cols: 24, rows: 14 },   // 720×420
+  medium: { cols: 32, rows: 19 },   // 960×570
+  large:  { cols: 42, rows: 25 }    // 1260×750
 };
 
 // Tamaño activo — se puede cambiar antes de initBoard()

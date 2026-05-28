@@ -1,1 +1,5 @@
 
+{"initials":"CAT","score":17,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T21:40:32.201Z"}
+{"initials":"CAT","score":12,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T21:55:15.174Z"}
+{"initials":"IGT","score":2,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T21:55:51.357Z"}
+{"initials":"X","score":2,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T22:58:55.124Z"}

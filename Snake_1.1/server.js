@@ -15,6 +15,14 @@ const PORT       = process.env.PORT || 3000;
 const SCORES_FILE = path.join(__dirname, "data", "scores.txt");
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  if (/\.(html|css|js)$/i.test(req.path)) {
+    res.set("Cache-Control", "no-cache, must-revalidate");
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname)));
 
 // ─── Páginas ──────────────────────────────────────────────────────────────

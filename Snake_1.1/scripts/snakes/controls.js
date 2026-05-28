@@ -76,13 +76,20 @@ export function registerDpadControls(container, onInput, playerNum = 1) {
     const dir = btn.dataset.dir;
     if (!dir) return;
 
-    btn.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      onInput({ player: playerNum, dir });
-    }, { passive: false });
+    if (window.PointerEvent) {
+      btn.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        onInput({ player: playerNum, dir });
+      });
+    } else {
+      btn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        onInput({ player: playerNum, dir });
+      }, { passive: false });
 
-    btn.addEventListener("mousedown", () => {
-      onInput({ player: playerNum, dir });
-    });
+      btn.addEventListener("mousedown", () => {
+        onInput({ player: playerNum, dir });
+      });
+    }
   });
 }

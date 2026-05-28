@@ -11,6 +11,9 @@ let audioCtx = null;
 /** Estado de silencio */
 let muted = false;
 
+const trumpetAudio = new Audio("./assets/trompetas12.mp3");
+trumpetAudio.preload = "auto";
+
 /**
  * Inicializa el contexto de audio.
  * Debe llamarse en respuesta a un gesto del usuario (click, etc.).
@@ -70,6 +73,13 @@ export function playLevelUp() {
   playBeep(523, 0.1, 0.3, "sine");
   setTimeout(() => playBeep(659, 0.1, 0.3, "sine"), 100);
   setTimeout(() => playBeep(784, 0.2, 0.3, "sine"), 200);
+}
+
+export function playTrumpets() {
+  if (muted) return;
+
+  trumpetAudio.currentTime = 0;
+  trumpetAudio.play().catch(() => {});
 }
 
 /** Sonido de game over */
