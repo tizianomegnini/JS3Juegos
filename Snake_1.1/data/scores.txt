@@ -1,9 +1,1 @@
 
-{"initials":"XDD","score":1,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"date":"2026-05-28T00:48:51.278Z"}
-{"initials":"IGT","score":66,"mode":"1P","settings":{"mapSize":"medium","foodCount":5,"wallMode":"wrap"},"mapSize":"medium","foodCount":5,"wallMode":"wrap","date":"2026-05-28T01:42:10.102Z"}
-{"initials":"CAP","score":10,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T01:45:05.901Z"}
-{"initials":"NAC","score":41,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T01:47:29.928Z"}
-{"initials":"LOL","score":27,"mode":"1P","settings":{"mapSize":"small","foodCount":5,"wallMode":"wall"},"mapSize":"small","foodCount":5,"wallMode":"wall","date":"2026-05-28T01:48:15.690Z"}
-{"initials":"CEL","score":22,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T01:50:30.384Z"}
-{"initials":"FON","score":23,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T02:17:56.569Z"}
-{"initials":"IGT","score":41,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T16:11:55.817Z"}
