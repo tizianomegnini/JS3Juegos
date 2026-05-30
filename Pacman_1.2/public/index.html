@@ -9,154 +9,104 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
-  <style>
-    /* CSS Personalizado */
-    body {
-      font-family: 'Press Start 2P', cursive;
-      /* Evita el scroll pull-to-refresh en celulares */
-      overscroll-behavior-y: contain; 
-    }
-    
-    .text-pacman { color: #FFD700 !important; }
-    
-    .btn-pacman {
-      background: transparent;
-      border: 1px solid #FFD700;
-      color: #FFD700;
-      letter-spacing: 2px;
-      transition: background 0.15s;
-    }
-    .btn-pacman:hover {
-      background: rgba(255, 215, 0, 0.13);
-      color: #FFD700;
-    }
-    
-    .text-shadow-pacman { text-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
-    .screen-min-h { min-height: 340px; }
-    
-    /* Contenedor principal fluido */
-    .game-container { 
-      width: 100%; 
-      max-width: 532px; /* Límite máximo para PC */
-      margin: 0 auto;
-    }
-
-    /* MAGIA RESPONSIVE PARA EL CANVAS */
-    #game {
-      width: 100%;
-      height: auto;
-      display: block;
-      /* Mantiene los píxeles nítidos al escalar */
-      image-rendering: pixelated; 
-    }
-
-    /* Lógica de estado Activo */
-    .screen.active, #hud.active, #dpad.active, #pauseOverlay.active { display: flex !important; }
-    #canvasWrap.active { display: block !important; }
-
-    /* D-PAD Grid (Escalado para pulgares) */
-    .dpad-grid {
-      display: grid;
-      /* Usa fracciones para que se adapte mejor o mantén un tamaño cómodo para tocar */
-      grid-template-columns: repeat(3, minmax(48px, 60px));
-      grid-template-rows: repeat(3, minmax(48px, 60px));
-      gap: 6px;
-      justify-content: center;
-    }
-    .dpbtn { 
-      touch-action: manipulation; /* Evita el delay del doble tap en móviles */
-    }
-    
-    /* Mensaje de Combo flotante */
-    #comboMsg {
-      text-shadow: 0 0 8px #00f;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s;
-      z-index: 10;
-    }
-
-    /* Ajustes tipográficos para pantallas muy chicas (iPhone SE, etc) */
-    @media (max-width: 400px) {
-      .hud-label { font-size: 8px !important; }
-      .hud-val { font-size: 12px !important; min-width: auto !important;}
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="bg-black text-white min-vh-100 d-flex align-items-center justify-content-center m-0 p-2">
+<body>
 
-  <div id="root" class="bg-black rounded flex-column align-items-center w-100 d-flex p-0 p-md-3" style="max-width: 600px;">
+<!-- Background layers -->
+<div id="stars"></div>
+<div id="vignette"></div>
+<div id="scanlines"></div>
 
-    <div id="menuScreen" class="screen active d-none flex-column align-items-center justify-content-center gap-3 p-3 text-center screen-min-h w-100">
-      <h1 class="text-pacman text-shadow-pacman mb-0" style="font-size: clamp(28px, 8vw, 42px); letter-spacing: 4px;">PAC-MAN</h1>
-      <p class="text-secondary m-0" style="font-size: clamp(9px, 3vw, 13px); letter-spacing: 1px;">ARROW KEYS / WASD<br>P = PAUSA · R = REINICIAR</p>
-      <p id="hsDisplay" class="text-pacman m-0" style="font-size: 13px; letter-spacing: 1px;"></p>
-      <button class="btn btn-pacman px-4 py-2 mt-2" style="font-size: 15px;" id="playBtn">JUGAR</button>
-    </div>
-
-    <div id="gameOverScreen" class="screen d-none flex-column align-items-center justify-content-center gap-3 p-3 text-center screen-min-h w-100">
-      <h1 class="text-danger mb-0" style="font-size: clamp(24px, 6vw, 28px);">GAME OVER</h1>
-      <p class="text-secondary m-0" style="font-size: 12px; letter-spacing: 1px;">PUNTUACIÓN</p>
-      <p class="text-pacman m-0 fw-medium" style="font-size: 28px;" id="finalScore">0</p>
-      <p id="newHsLabel" class="text-pacman m-0" style="display:none; font-size: 12px; letter-spacing: 1px;">¡NUEVO RÉCORD!</p>
-      <button class="btn btn-pacman px-4 py-2 mt-2" style="font-size: 15px;" id="goBtn">REINTENTAR</button>
-    </div>
-
-    <div id="winScreen" class="screen d-none flex-column align-items-center justify-content-center gap-3 p-3 text-center screen-min-h w-100">
-      <h1 class="text-success mb-0" style="font-size: clamp(24px, 6vw, 28px);">¡GANASTE!</h1>
-      <p class="text-secondary m-0" style="font-size: 12px; letter-spacing: 1px;">PUNTUACIÓN FINAL</p>
-      <p class="text-pacman m-0 fw-medium" style="font-size: 28px;" id="winScore">0</p>
-      <button class="btn btn-pacman px-4 py-2 mt-2" style="font-size: 15px;" id="winBtn">JUGAR DE NUEVO</button>
-    </div>
-
-    <div id="hud" class="d-none justify-content-between align-items-center px-2 py-2 bg-dark rounded-top game-container w-100">
-      <div class="d-flex flex-column align-items-center gap-1">
-        <span class="text-secondary hud-label" style="font-size: 10px; letter-spacing: 1px;">SCORE</span>
-        <span class="text-pacman fw-medium text-center hud-val" style="font-size: 16px; min-width: 40px;" id="scoreUI">0</span>
-      </div>
-      <div class="d-flex flex-column align-items-center gap-1">
-        <span class="text-secondary hud-label" style="font-size: 10px; letter-spacing: 1px;">RECORD</span>
-        <span class="text-pacman fw-medium text-center hud-val" style="font-size: 16px; min-width: 40px;" id="hsUI">0</span>
-      </div>
-      <div class="d-flex flex-column align-items-center gap-1">
-        <span class="text-secondary hud-label" style="font-size: 10px; letter-spacing: 1px;">NIVEL</span>
-        <span class="text-pacman fw-medium text-center hud-val" style="font-size: 16px; min-width: 40px;" id="levelUI">1</span>
-      </div>
-      <div class="d-flex flex-column align-items-center gap-1">
-        <span class="text-secondary hud-label" style="font-size: 10px; letter-spacing: 1px;">VIDAS</span>
-        <span class="text-pacman fw-medium text-center hud-val" style="font-size: 14px; min-width: 40px;" id="livesUI">❤❤❤</span>
-      </div>
-    </div>
-
-    <div id="canvasWrap" class="position-relative d-none game-container w-100">
-      <canvas id="game"></canvas>
-      <div id="comboMsg" class="position-absolute top-50 start-50 translate-middle text-white fs-4 fw-medium"></div>
-      
-      <div id="pauseOverlay" class="d-none position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-75 flex-column align-items-center justify-content-center gap-2 z-3">
-        <p class="text-white m-0 fw-medium" style="font-size: clamp(16px, 5vw, 24px); letter-spacing: 3px;">PAUSA</p>
-        <small class="text-secondary text-center px-2" style="font-size: clamp(9px, 3vw, 12px);">Presioná P para continuar</small>
-      </div>
-    </div>
-
-    <div id="dpad" class="d-none flex-column align-items-center py-3 bg-dark rounded-bottom game-container w-100">
-      <div class="dpad-grid">
-        <div class="invisible"></div>
-        <button class="btn btn-dark border-secondary text-secondary fs-5 d-flex align-items-center justify-content-center user-select-none dpbtn" data-dir="up">▲</button>
-        <div class="invisible"></div>
-        
-        <button class="btn btn-dark border-secondary text-secondary fs-5 d-flex align-items-center justify-content-center user-select-none dpbtn" data-dir="left">◀</button>
-        <div class="invisible"></div>
-        <button class="btn btn-dark border-secondary text-secondary fs-5 d-flex align-items-center justify-content-center user-select-none dpbtn" data-dir="right">▶</button>
-        
-        <div class="invisible"></div>
-        <button class="btn btn-dark border-secondary text-secondary fs-5 d-flex align-items-center justify-content-center user-select-none dpbtn" data-dir="down">▼</button>
-        <div class="invisible"></div>
-      </div>
-    </div>
-
+<!-- ─── MENU ─── -->
+<div id="menuScreen" class="screen active">
+  <div class="menu-logo">
+    <div class="logo-title">PAC-MAN</div>
+    <div class="logo-title">ULTRA</div>
+    <div class="logo-sub">▸ ARCADE EDITION ◂</div>
   </div>
+  <div class="menu-pac-demo">😮</div>
+  <div class="menu-ghost-row">👻👻👻👻</div>
+  <div class="high-score-display" id="hsDisplay"></div>
+  <button class="btn" id="playBtn">▶ JUGAR</button>
+  <div style="font-size:7px;color:rgba(255,255,255,0.3);letter-spacing:2px;text-align:center;line-height:1.8">
+    WASD / FLECHAS · P = PAUSA<br>TÁCTIL: D-PAD O DESLIZAR
+  </div>
+</div>
+
+<!-- ─── GAME OVER ─── -->
+<div id="gameOverScreen" class="screen">
+  <div class="screen-title">GAME<br>OVER</div>
+  <div class="score-display">PUNTAJE: <span id="finalScore">0</span></div>
+  <div id="newHsLabel">🏆 ¡NUEVO RÉCORD!</div>
+  <button class="btn" id="goBtn">↩ REINTENTAR</button>
+  <button class="btn btn-secondary" id="goMenuBtn">MENÚ</button>
+</div>
+
+<!-- ─── WIN ─── -->
+<div id="winScreen" class="screen">
+  <div class="screen-title" style="color:#FFD700">¡GANASTE!</div>
+  <div style="font-size:30px">🏆</div>
+  <div class="score-display">PUNTAJE FINAL: <span id="winScore">0</span></div>
+  <button class="btn" id="winBtn">▶ JUGAR DE NUEVO</button>
+  <button class="btn btn-secondary" id="winMenuBtn">MENÚ</button>
+</div>
+
+<!-- ─── HUD ─── -->
+<div id="hud">
+  <div class="hud-item">
+    <div class="hud-label">SCORE</div>
+    <div class="hud-value" id="scoreUI">0</div>
+  </div>
+  <div class="hud-item">
+    <div class="hud-label">VIDAS</div>
+    <div class="hud-value" id="livesUI">❤❤❤</div>
+  </div>
+  <div class="hud-item">
+    <div class="hud-label">NIVEL</div>
+    <div class="level-badge" id="levelUI">1</div>
+  </div>
+  <div class="hud-item">
+    <div class="hud-label">RÉCORD</div>
+    <div class="hud-value" id="hsUI">0</div>
+  </div>
+</div>
+
+<!-- ─── CANVAS ─── -->
+<div id="canvasWrap">
+  <canvas id="game"></canvas>
+</div>
+
+<!-- ─── PAUSE ─── -->
+<div id="pauseOverlay">
+  <div class="pause-text">⏸ PAUSA</div>
+  <div class="pause-hint">CLICK / P PARA CONTINUAR</div>
+</div>
+
+<!-- ─── LEVEL TRANSITION ─── -->
+<div id="levelTransition">
+  <div class="level-transition-text">NIVEL</div>
+  <div class="level-transition-num" id="ltNum">1</div>
+  <div class="level-transition-text" id="ltMsg">¡PREPARATE!</div>
+</div>
+
+<!-- ─── COMBO ─── -->
+<div id="comboMsg">+200 × 1!</div>
+
+<!-- ─── FRIGHT BAR ─── -->
+<div id="frightBar"></div>
+
+<!-- ─── SWIPE HINT ─── -->
+<div id="swipeHint">DESLIZA PARA MOVER</div>
+
+<!-- ─── D-PAD ─── -->
+<div id="dpad">
+  <button class="dpbtn" data-dir="up">▲</button>
+  <button class="dpbtn" data-dir="left">◀</button>
+  <button class="dpbtn" data-dir="right">▶</button>
+  <button class="dpbtn" data-dir="down">▼</button>
+</div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="main.js"></script>
