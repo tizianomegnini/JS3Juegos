@@ -46,7 +46,7 @@ const MAPS = [
     [1,1,1,1,2,1,0,1,1,1,1,1,0,1,2,1,1,1,1],
     [1,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,1],
     [1,2,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,2,1],
-    [1,3,2,2,2,2,2,2,2,0,2,2,2,2,2,2,2,3,1],
+    [1,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1],
     [1,1,2,1,1,1,2,1,1,1,1,1,2,1,1,1,2,1,1],
     [1,2,2,2,2,2,2,1,1,1,1,1,2,2,2,2,2,2,1],
     [1,2,1,1,1,1,2,2,2,1,2,2,2,1,1,1,1,2,1],
@@ -100,7 +100,7 @@ const MAPS = [
     [1,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,1],
     [1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1],
     [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-    [1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,1,1,1,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
   ],
   // NIVEL 5 (Mínimos muros, alto riesgo)
@@ -157,19 +157,6 @@ const ctx=canvas.getContext('2d');
 canvas.width=COLS*TILE;
 canvas.height=ROWS*TILE;
 
-// --- CARGA DE IMÁGENES PNG ---
-const imgPlayer = new Image(); 
-imgPlayer.src = 'player.png'; // Cambia por el nombre de tu archivo
-
-const imgGhosts = [new Image(), new Image(), new Image(), new Image()];
-imgGhosts[0].src = 'fantasma0.png'; // Rojo
-imgGhosts[1].src = 'fantasma1.png'; // Rosa
-imgGhosts[2].src = 'fantasma2.png'; // Cian
-imgGhosts[3].src = 'fantasma3.png'; // Naranja
-
-const imgFrightened = new Image(); 
-imgFrightened.src = 'asustado.png'; // Cuando agarraste la pastilla de poder
-
 let highScore=0;
 try{highScore=parseInt(localStorage.getItem('pmhs')||'0');}catch(e){}
 hsDisplay.textContent=highScore>0?`RÉCORD: ${highScore}`:'';
@@ -214,7 +201,7 @@ function cloneMap(){
 }
 function countDots(m){let c=0;for(const r of m)for(const v of r)if(v===2||v===3)c++;return c;}
 function wrap(v,max){return((v%max)+max)%max;}
-function getTile(x,y){const tx=wrap(Math.round(x),COLS),ty=wrap(Math.round(y),ROWS);return{tx,ty,value:map[ty]?.[tx]??1};}
+function getTile(x,y){const tx=wrap(Math.floor(x+0.5),COLS),ty=wrap(Math.floor(y+0.5),ROWS);return{tx,ty,value:map[ty]?.[tx]??1};}
 function isWalkable(x,y,fg=false){const{value}=getTile(x,y);return fg?value!==1:value!==1&&value!==4;}
 function canStep(e,d,fg=false){return isWalkable(e.x+d.x,e.y+d.y,fg);}
 function isCentered(e,tol=0.12){return Math.abs(e.x-Math.round(e.x))<tol&&Math.abs(e.y-Math.round(e.y))<tol;}
@@ -250,18 +237,12 @@ function switchModeIfNeeded(){modeTimer++;if(modeTimer>=getCurrentPhaseFrames())
 // DIFICULTAD: El jugador es levemente más rápido, pero los fantasmas crecen mucho más en velocidad.
 function playerSpeed(){return Math.min(0.145, 0.105+(level-1)*0.01);}
 
-// --- 1. ACTUALIZAR LA VELOCIDAD (Para añadir la "Sobrecarga" del Dron 0) ---
-function ghostSpeed(g, fr=false, ea=false){
-  let s = g.baseSpeed + (level-1)*0.007; 
-  
-  // SOBRECARGA: El Dron 0 (Rastreador) acelera si te faltan menos de 30 bits
-  if (g.id === 0 && dots < 30) {
-    s += 0.015; 
-  }
-  
+// DIFICULTAD: Escalado agresivo de fantasmas a partir del nivel 4
+function ghostSpeed(base,fr=false,ea=false){
+  let s = base + (level-1)*0.007; 
   if (level >= 4) s += 0.01; 
-  if(fr) s *= 0.58;  // Lentos cuando están corruptos (asustados)
-  if(ea) s *= 1.45;  // Muy rápidos cuando vuelven a la base
+  if(fr) s *= 0.58;
+  if(ea) s *= 1.45;
   return s;
 }
 
@@ -350,30 +331,13 @@ function getInkyTarget(){
 }
 
 function chooseGhostTarget(g){
-  const pt = getPlayerTile();
-  
-  switch(g.id) {
-    case 0: 
-      // ROJO (El Cazador): Va directo a tus coordenadas, sin pensar.
-      return pt;
-      
-    case 1: 
-      // ROSA (El Trampero): Intenta cortarte el paso. Apunta 6 casillas por delante de ti.
-      if(player.dir.x === 0 && player.dir.y === 0) return pt;
-      return getAheadTile(6);
-      
-    case 2: 
-      // CIAN (El Impredecible): Se mueve de forma 100% aleatoria por el mapa. 
-      // Nunca te persigue directamente, lo que lo hace muy molesto porque te lo cruzas por accidente.
-      // (Cambia su objetivo a un punto al azar constantemente).
-      return {x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS)};
-      
-    case 3: 
-      // NARANJA (El Guardián): Defiende su esquina (scatter). 
-      // Solo te persigue si te acercas demasiado (a menos de 20 casillas de distancia).
-      const dist = distSq(g.x, g.y, player.x, player.y);
-      return dist < 20 ? pt : g.scatter;
-  }
+  const pt=getPlayerTile();
+  if(g.id===0)return pt;
+  if(g.id===1)return getAheadTile(4);
+  if(g.id===2)return getInkyTarget();
+  // DIFICULTAD: Clyde se vuelve más agresivo con cada nivel y huye menos frecuentemente.
+  const clydeThreshold = Math.max(16, 64 - (level-1)*16);
+  return distSq(g.x,g.y,player.x,player.y) < clydeThreshold ? g.scatter : pt;
 }
 
 function getBestDir(g,target){
@@ -428,7 +392,7 @@ function moveGhosts(){
       if(g.houseTimer<=0){g.inHouse=false;g.eaten=false;g.frightened=false;g.x=g.home.x;g.y=g.home.y;g.dir={x:0,y:-1};}
       return;
     }
-    const sp=ghostSpeed(g, g.frightened, g.eaten);
+    const sp=ghostSpeed(g.baseSpeed,g.frightened,g.eaten);
     if(isCentered(g)){
       if(g.eaten){g.dir=getBestDir(g,g.home);}
       else if(g.frightened){
@@ -474,37 +438,21 @@ function togglePause(){
   pauseOverlay.classList.toggle('active',paused);
 }
 
-// --- 1. DIBUJAR EL LABERINTO (Placa de Circuitos) ---
 function drawMaze(){
   for(let r=0;r<ROWS;r++){
     for(let c=0;c<COLS;c++){
       const v=map[r][c],px=c*TILE,py=r*TILE;
       if(v===1){
-        // Muros de circuitos neón
-        ctx.fillStyle='#08081a'; 
-        ctx.fillRect(px,py,TILE,TILE);
-        ctx.strokeStyle='#00ffcc'; // Borde brillante
-        ctx.lineWidth=2; 
-        ctx.strokeRect(px+.5,py+.5,TILE-1,TILE-1);
+        ctx.fillStyle='#1a1aff';ctx.fillRect(px,py,TILE,TILE);
+        ctx.strokeStyle='#3a3aff';ctx.lineWidth=1;ctx.strokeRect(px+.5,py+.5,TILE-1,TILE-1);
       }else if(v===4){
-        // Casa de los Antivirus (Zona restringida)
-        ctx.fillStyle='#2a0000'; 
-        ctx.fillRect(px,py,TILE,TILE);
+        ctx.fillStyle='#110022';ctx.fillRect(px,py,TILE,TILE);
       }else{
-        // Fondo del servidor
-        ctx.fillStyle='#020205'; 
-        ctx.fillRect(px,py,TILE,TILE);
-        
-        if(v===2){
-          // Bits de datos (Cuadrados pequeños)
-          ctx.fillStyle='#00ffff'; 
-          ctx.fillRect(px+TILE/2-2,py+TILE/2-2,4,4);
-        }
+        ctx.fillStyle='#000';ctx.fillRect(px,py,TILE,TILE);
+        if(v===2){ctx.fillStyle='#FFD700';ctx.beginPath();ctx.arc(px+TILE/2,py+TILE/2,2.5,0,Math.PI*2);ctx.fill();}
         else if(v===3){
-          // Rootkits (Cuadrados magenta parpadeantes)
-          ctx.fillStyle='#ff00ff';
-          const pulse = (Date.now() % 600 < 300) ? 6 : 4; // Efecto de pulso
-          ctx.fillRect(px+TILE/2-pulse,py+TILE/2-pulse,pulse*2,pulse*2);
+          ctx.fillStyle='#FFD700';ctx.beginPath();ctx.arc(px+TILE/2,py+TILE/2,5.5,0,Math.PI*2);ctx.fill();
+          ctx.fillStyle='rgba(255,215,0,0.25)';ctx.beginPath();ctx.arc(px+TILE/2,py+TILE/2,10,0,Math.PI*2);ctx.fill();
         }
       }
     }
@@ -512,53 +460,47 @@ function drawMaze(){
 }
 
 function drawPlayer(){
-  if(invTimer>0 && Math.floor(invTimer/6)%2===0) return; // Parpadeo de invencibilidad
-  
-  const px = player.x * TILE;
-  const py = player.y * TILE;
-  const angle = Math.atan2(player.dir.y, player.dir.x);
-  
-  ctx.save();
-  // Nos movemos al centro del tile para poder rotar la imagen hacia donde miras
-  ctx.translate(px + TILE/2, py + TILE/2);
-  if(player.dir.x !== 0 || player.dir.y !== 0) {
-    ctx.rotate(angle);
-  }
-  
-  // Dibujamos la imagen centrada
-  if(imgPlayer.complete) {
-    ctx.drawImage(imgPlayer, -TILE/2, -TILE/2, TILE, TILE);
-  }
+  if(invTimer>0&&Math.floor(invTimer/6)%2===0)return;
+  mouthAngle+=0.15*mouthDir;
+  if(mouthAngle>0.35)mouthDir=-1;if(mouthAngle<0.02)mouthDir=1;
+  const mouth=(player.dir.x===0&&player.dir.y===0)?0.05:mouthAngle;
+  const angle=Math.atan2(player.dir.y,player.dir.x);
+  const px=player.x*TILE+TILE/2,py=player.y*TILE+TILE/2,r=TILE/2-2;
+  ctx.save();ctx.translate(px,py);ctx.rotate(angle);
+  ctx.fillStyle='#FFD700';ctx.beginPath();ctx.moveTo(0,0);
+  ctx.arc(0,0,r,mouth*Math.PI,(2-mouth)*Math.PI);ctx.closePath();ctx.fill();
   ctx.restore();
 }
 
 function drawGhosts(){
-  ghosts.forEach(g => {
-    if(g.inHouse) return;
-    
-    const px = g.x * TILE;
-    const py = g.y * TILE;
-    
-    // Si fue comido, dibujamos solo unos ojos básicos de respaldo
+  ghosts.forEach(g=>{
+    if(g.inHouse)return;
+    const px=g.x*TILE+TILE/2,py=g.y*TILE+TILE/2,r=TILE/2-2;
     if(g.eaten){
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(px + TILE/4, py + TILE/4, TILE/2, TILE/4);
+      ctx.fillStyle='#fff';
+      ctx.beginPath();ctx.ellipse(px-4,py-3,4,5,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(px+4,py-3,4,5,0,0,Math.PI*2);ctx.fill();
+      const ex=g.dir.x*2,ey=g.dir.y*2;
+      ctx.fillStyle='#00f';
+      ctx.beginPath();ctx.arc(px-4+ex,py-3+ey,2.5,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(px+4+ex,py-3+ey,2.5,0,Math.PI*2);ctx.fill();
       return;
     }
-    
-    // Decidimos qué imagen usar
-    let currentImg = imgGhosts[g.id];
-    if (g.frightened) {
-      // Parpadeo cuando se está por acabar el efecto
-      if (frightTimer < 80 && Math.floor(frightTimer/10)%2===0) {
-        currentImg = imgGhosts[g.id]; // Vuelve a su color normal brevemente
-      } else {
-        currentImg = imgFrightened; // Imagen de asustado
-      }
-    }
-    
-    if(currentImg.complete) {
-      ctx.drawImage(currentImg, px, py, TILE, TILE);
+    let col=g.color;
+    if(g.frightened){col=(frightTimer<80&&Math.floor(frightTimer/10)%2===0)?'#ffffff':'#0000cc';}
+    ctx.fillStyle=col;
+    ctx.beginPath();ctx.arc(px,py-2,r,Math.PI,0);ctx.lineTo(px+r,py+r);
+    const ww=(r*2)/3;
+    for(let i=3;i>=0;i--)ctx.arc(px-r+ww*i+ww/2,py+r,ww/2,0,Math.PI,i%2===0);
+    ctx.closePath();ctx.fill();
+    if(!g.frightened){
+      ctx.fillStyle='#fff';
+      ctx.beginPath();ctx.ellipse(px-4,py-3,4,5,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(px+4,py-3,4,5,0,0,Math.PI*2);ctx.fill();
+      const ex=g.dir.x*2,ey=g.dir.y*2;
+      ctx.fillStyle='#00f';
+      ctx.beginPath();ctx.arc(px-4+ex,py-3+ey,2.5,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(px+4+ex,py-3+ey,2.5,0,Math.PI*2);ctx.fill();
     }
   });
 }
@@ -599,4 +541,4 @@ function startGame(){
 
 document.getElementById('playBtn').addEventListener('click',startGame);
 document.getElementById('goBtn').addEventListener('click',startGame);
-document.getElementById('winBtn').addEventListener('click',startGame);
+document.getElementById('winBtn').addEventListener('click',startGame);document.getElementById('pauseOverlay').addEventListener('click', togglePause);
