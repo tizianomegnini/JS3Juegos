@@ -113,7 +113,7 @@ function getRandomDir(g) {
 
 // Comportamiento frightened diferente para cada bicho
 function getFrightenedDir(g) {
-  return getRandomDir(g);
+  // return getRandomDir(g);
   switch (g.id) {
     case 0:
       // Blinky: huye activamente maximizando distancia al jugador.
@@ -140,7 +140,8 @@ function getFrightenedDir(g) {
   }
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
 //  MOVE GHOSTS
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function moveGhosts() {
@@ -196,8 +197,10 @@ function moveGhosts() {
     // â”€â”€ Aplicar movimiento â”€â”€
     g.x = wrap(g.x + g.dir.x * sp, COLS);
     g.y = wrap(g.y + g.dir.y * sp, ROWS);
-    if (Math.abs(g.x - Math.round(g.x)) < sp) g.x = Math.round(g.x);
-    if (Math.abs(g.y - Math.round(g.y)) < sp) g.y = Math.round(g.y);
+    // Snap-to-grid SOLO si estamos dentro de 10% de la velocidad del grid
+    const snapThreshold = sp * 0.1;
+    if (Math.abs(g.x - Math.round(g.x)) < snapThreshold) g.x = Math.round(g.x);
+    if (Math.abs(g.y - Math.round(g.y)) < snapThreshold) g.y = Math.round(g.y);
 
     // â”€â”€ LlegÃ³ a casa tras ser comido â”€â”€
     if (g.eaten && Math.round(g.x) === g.home.x && Math.round(g.y) === g.home.y) {

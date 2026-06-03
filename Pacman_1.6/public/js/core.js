@@ -265,7 +265,7 @@ function getTile(x, y) {
 }
 function isWalkable(x, y, fg=false) {
   const { value } = getTile(x, y);
-  return fg ? value !== 1 : value !== 1 && value !== 4;
+  return value !== 1; // Ambos pueden caminar donde no haya muros
 }
 function canStep(e, d, fg=false) { return isWalkable(e.x+d.x, e.y+d.y, fg); }
 function isCentered(e, tol=0.13) {
@@ -280,8 +280,8 @@ function updateHUD() {
   scoreUI.textContent = score.toLocaleString();
   levelUI.textContent = level;
   livesUI.innerHTML = lives > 0
-    ? 'â¤'.repeat(Math.min(lives, 5)) + (lives > 5 ? `+${lives-5}` : '')
-    : 'âœ—';
+    ? '❤'.repeat(Math.min(lives, 5)) + (lives > 5 ? `+${lives-5}` : '')
+    : '✗';
   if (score > highScore) {
     highScore = score;
     hsUI.textContent = highScore.toLocaleString();
@@ -292,7 +292,7 @@ function updateHUD() {
 }
 
 function updateHsDisplay() {
-  hsDisplay.textContent = highScore > 0 ? `ðŸ† RÃ‰CORD: ${highScore.toLocaleString()}` : '';
+  hsDisplay.textContent = highScore > 0 ? `🏆 RÉCORD: ${highScore.toLocaleString()}` : '';
 }
 
 function updateFrightBar() {
@@ -416,7 +416,7 @@ function spawnGhosts() {
     dir: i%2===0 ? {x:1,y:0} : {x:-1,y:0},
     color, name: GHOST_NAMES[i],
     frightened: false, eaten: false, inHouse: i>0,
-    houseTimer: Math.max(0, [0, 120, 240, 360][i] - (level-1)*35),
+    houseTimer: Math.max(0, [0, 30, 60, 90][i] - (level-1)*20),
     home: {x:9, y:9}, scatter: GHOST_SCATTER[i],
     baseSpeed: 0.074 - i*0.004,
     blinkFrame: 0,
