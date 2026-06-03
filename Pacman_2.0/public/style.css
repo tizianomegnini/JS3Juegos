@@ -1,4 +1,4 @@
-:root {
+ :root {
     --yellow: #FFD700;
     --blue: #1a1aff;
     --blue-light: #4444ff;
@@ -367,7 +367,7 @@
     grid-template-rows: repeat(3, 52px);
     gap: 4px;
   }
-  #dpad.active { display: grid; }
+  #dpad.active { display: none; }
 
   .dpbtn {
     background: rgba(255,215,0,0.12);
@@ -444,11 +444,29 @@
     display: none;
   }
 
-  /* Responsive canvas scaling */
-  @media (max-width: 600px) {
-    #dpad { bottom: 10px; }
-    .dpbtn { width: 48px; height: 48px; font-size: 18px; }
-    #swipeHint { display: block; }
+  /* Touch controls only on mobile landscape */
+  @media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+    #dpad.active {
+      display: grid;
+      bottom: 10px;
+    }
+
+    .dpbtn {
+      width: 48px;
+      height: 48px;
+      font-size: 18px;
+    }
+
+    #swipeHint.active {
+      display: block;
+    }
+  }
+
+  @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+    #swipeHint.active {
+      display: block;
+      bottom: 76px;
+    }
   }
 
   /* Scanline effect overlay */
