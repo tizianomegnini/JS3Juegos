@@ -9,3 +9,7 @@
 {"initials":"NAC","score":37,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-31T00:27:17.660Z"}
 {"initials":"IGT","score":20,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-31T00:28:01.411Z"}
 {"initials":"XDL","score":16,"mode":"1P","settings":{"mapSize":"small","foodCount":5,"wallMode":"wrap"},"mapSize":"small","foodCount":5,"wallMode":"wrap","date":"2026-05-31T00:43:52.516Z"}
+{"initials":"IGT","score":116,"mode":"1P","settings":{"mapSize":"medium","foodCount":5,"wallMode":"wall"},"mapSize":"medium","foodCount":5,"wallMode":"wall","date":"2026-05-31T15:06:10.386Z"}
+{"initials":"IGT","score":42,"mode":"1P","settings":{"mapSize":"small","foodCount":5,"wallMode":"wrap"},"mapSize":"small","foodCount":5,"wallMode":"wrap","date":"2026-06-01T22:57:28.372Z"}
+{"initials":"IGT","score":100,"mode":"1P","settings":{"mapSize":"large","foodCount":5,"wallMode":"wrap"},"mapSize":"large","foodCount":5,"wallMode":"wrap","date":"2026-06-01T23:13:36.295Z"}
+{"initials":"STA","score":64,"mode":"1P","settings":{"mapSize":"small","foodCount":5,"wallMode":"wrap"},"mapSize":"small","foodCount":5,"wallMode":"wrap","date":"2026-06-01T23:25:04.668Z"}

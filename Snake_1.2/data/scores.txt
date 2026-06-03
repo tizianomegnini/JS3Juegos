@@ -1,0 +1,13 @@
+
+{"initials":"CAT","score":17,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T21:40:32.201Z"}
+{"initials":"CAT","score":12,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T21:55:15.174Z"}
+{"initials":"IGT","score":2,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T21:55:51.357Z"}
+{"initials":"X","score":2,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-28T22:58:55.124Z"}
+{"initials":"IGT","score":64,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-30T13:18:37.802Z"}
+{"initials":"IGT","score":89,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-30T13:38:14.796Z"}
+{"initials":"IGT","score":65,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-31T00:25:04.905Z"}
+{"initials":"NAC","score":37,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-31T00:27:17.660Z"}
+{"initials":"IGT","score":20,"mode":"1P","settings":{"mapSize":"medium","foodCount":1,"wallMode":"wall"},"mapSize":"medium","foodCount":1,"wallMode":"wall","date":"2026-05-31T00:28:01.411Z"}
+{"initials":"XDL","score":16,"mode":"1P","settings":{"mapSize":"small","foodCount":5,"wallMode":"wrap"},"mapSize":"small","foodCount":5,"wallMode":"wrap","date":"2026-05-31T00:43:52.516Z"}
+{"initials":"IGT","score":116,"mode":"1P","settings":{"mapSize":"medium","foodCount":5,"wallMode":"wall"},"mapSize":"medium","foodCount":5,"wallMode":"wall","date":"2026-05-31T15:06:10.386Z"}
+{"initials":"IGT","score":44,"mode":"1P","settings":{"mapSize":"small","foodCount":5,"wallMode":"wrap"},"mapSize":"small","foodCount":5,"wallMode":"wrap","date":"2026-06-01T22:22:19.123Z"}

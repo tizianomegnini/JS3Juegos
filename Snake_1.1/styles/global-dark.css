@@ -28,8 +28,8 @@
 
   --border-color:    #2a4a2a;
   --border-focus:    #4dc94d;
-  --shadow:          0 4px 20px rgba(77, 201, 77, 0.15);
-  --shadow-hover:    0 8px 32px rgba(77, 201, 77, 0.28);
+  --shadow:          0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-hover:    0 8px 32px rgba(0, 0, 0, 0.4);
   --shadow-card:     0 2px 12px rgba(0, 0, 0, 0.5);
 
   --input-bg:        #122012;
@@ -71,7 +71,11 @@ body {
   line-height:      1.6;
 }
 
-/* ─── Patrón de fondo animado ───────────────────────────────────────────── */
+body > * {
+  position: relative;
+  z-index:  1;
+}
+
 body::before {
   content:    '';
   position:   fixed;
@@ -92,11 +96,6 @@ body::before {
   );
   pointer-events: none;
   z-index:        0;
-}
-
-body > * {
-  position: relative;
-  z-index:  1;
 }
 
 /* ─── Navbar ────────────────────────────────────────────────────────────── */
