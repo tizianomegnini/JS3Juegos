@@ -280,8 +280,8 @@ function updateHUD() {
   scoreUI.textContent = score.toLocaleString();
   levelUI.textContent = level;
   livesUI.innerHTML = lives > 0
-    ? 'â¤'.repeat(Math.min(lives, 5)) + (lives > 5 ? `+${lives-5}` : '')
-    : 'âœ—';
+    ? '❤'.repeat(Math.min(lives, 5)) + (lives > 5 ? `+${lives-5}` : '')
+    : '✗';
   if (score > highScore) {
     highScore = score;
     hsUI.textContent = highScore.toLocaleString();
@@ -292,7 +292,7 @@ function updateHUD() {
 }
 
 function updateHsDisplay() {
-  hsDisplay.textContent = highScore > 0 ? `ðŸ† RÃ‰CORD: ${highScore.toLocaleString()}` : '';
+  hsDisplay.textContent = highScore > 0 ? `🏆 RÉCORD: ${highScore.toLocaleString()}` : '';
 }
 
 function updateFrightBar() {
