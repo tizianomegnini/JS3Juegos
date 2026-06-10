@@ -17,7 +17,11 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: var(--bg);
+    background-image: url("imgs/elindio.png");
+    background-size: cover;        /* Ajusta la imagen a toda la pantalla */
+    background-position: center;   /* Centra la imagen */
+    background-repeat: no-repeat;  /* Evita que se repita */
+    background-attachment: fixed;  /* (opcional) efecto tipo "parallax" */
     font-family: 'Press Start 2P', monospace;
     color: var(--white);
     min-height: 100vh;
