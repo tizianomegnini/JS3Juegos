@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking - Space Hunter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="ranking-page">
+  <div id="stars"></div>
+  <div id="vignette"></div>
+  <div id="scanlines"></div>
+
+  <main class="ranking-shell">
+    <header class="ranking-header">
+      <div class="logo-title">RANKING</div>
+      <div class="logo-sub">SPACE HUNTER</div>
+    </header>
+
+    <section class="ranking-board" aria-live="polite">
+      <div class="ranking-row ranking-head">
+        <span>#</span>
+        <span>NOMBRE</span>
+        <span>PUNTAJE</span>
+        <span>NIVEL</span>
+        <span>FECHA</span>
+      </div>
+      <div id="rankingRows" class="ranking-rows">
+        <div class="ranking-empty">CARGANDO...</div>
+      </div>
+    </section>
+
+    <nav class="ranking-actions">
+      <a class="btn" href="index.html">JUGAR</a>
+      <button class="btn btn-secondary" id="refreshRankingBtn" type="button">ACTUALIZAR</button>
+    </nav>
+  </main>
+
+  <script src="ranking.js"></script>
+</body>
+</html>
