@@ -5,7 +5,7 @@ const path = require('path');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const SCORES_FILE = path.join(__dirname, 'scores.json');
 const MAX_SCORES = 50;
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3021;
 
 const MIME = {
   '.html': 'text/html',

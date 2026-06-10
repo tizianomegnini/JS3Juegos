@@ -261,11 +261,11 @@ function wrap(v, max) { return ((v % max) + max) % max; }
 function getTile(x, y) {
   const tx = wrap(Math.floor(x+0.5), COLS);
   const ty = wrap(Math.floor(y+0.5), ROWS);
-  return { tx, ty, value: map[ty]?.[tx] ?? 1 };
+  return { tx, ty, value: map[ty]?.[tx] ?? 1 }; // Default to wall if out of bounds
 }
 function isWalkable(x, y, fg=false) {
   const { value } = getTile(x, y);
-  return value !== 1; // Ambos pueden caminar donde no haya muros
+  return fg ? value !== 1 : value !== 1 && value !== 4; // Ghosts can walk on 4 (gate), player cannot
 }
 function canStep(e, d, fg=false) { return isWalkable(e.x+d.x, e.y+d.y, fg); }
 function isCentered(e, tol=0.13) {
@@ -416,7 +416,7 @@ function spawnGhosts() {
     dir: i%2===0 ? {x:1,y:0} : {x:-1,y:0},
     color, name: GHOST_NAMES[i],
     frightened: false, eaten: false, inHouse: i>0,
-    houseTimer: Math.max(0, [0, 30, 60, 90][i] - (level-1)*20),
+    houseTimer: Math.max(0, [0, 120, 240, 360][i] - (level-1)*35), // Longer initial house timers
     home: {x:9, y:9}, scatter: GHOST_SCATTER[i],
     baseSpeed: 0.074 - i*0.004,
     blinkFrame: 0,

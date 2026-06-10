@@ -14,7 +14,7 @@ function movePlayer() {
 
   player.x = wrap(player.x + player.dir.x * player.speed, COLS);
   player.y = wrap(player.y + player.dir.y * player.speed, ROWS);
-  if (isCentered(player, player.speed)) { player.x = Math.round(player.x); player.y = Math.round(player.y); }
+  if (isCentered(player, player.speed * 0.5)) { player.x = Math.round(player.x); player.y = Math.round(player.y); }
 
   const { tx, ty, value } = getTile(player.x, player.y);
 

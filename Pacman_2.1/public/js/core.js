@@ -267,6 +267,29 @@ function getTile(x, y) {
   const ty = wrap(Math.floor(y+0.5), ROWS);
   return { tx, ty, value: map[ty]?.[tx] ?? 1 };
 }
+
+function findSpawnPosition() {
+  const candidates = [
+    { x: 9, y: 16 },
+    { x: 9, y: 15 },
+    { x: 9, y: 14 },
+    { x: 8, y: 16 },
+    { x: 10, y: 16 },
+    { x: 8, y: 15 },
+    { x: 10, y: 15 },
+  ];
+  for (const pos of candidates) {
+    const tile = getTile(pos.x, pos.y);
+    if (tile.value !== 1 && tile.value !== 4) return pos;
+  }
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      const tile = getTile(x, y);
+      if (tile.value !== 1 && tile.value !== 4) return { x, y };
+    }
+  }
+  return { x: 9, y: 16 };
+}
 function isWalkable(x, y, fg=false) {
   const { value } = getTile(x, y);
   return fg ? value !== 1 : value !== 1 && value !== 4;
@@ -519,7 +542,8 @@ function spawnGhosts() {
 }
 
 function spawnPlayer() {
-  player = { x:9, y:16, dir:{x:0,y:0}, speed:playerSpeed() };
+  const startPos = findSpawnPosition();
+  player = { x:startPos.x, y:startPos.y, dir:{x:0,y:0}, speed:playerSpeed() };
   invTimer = 120;
 }
 

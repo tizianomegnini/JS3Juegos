@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Juego web de Pac-Man adaptativo y multijugador",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js"
   },
