@@ -60,11 +60,11 @@ const MAPS = [
     [1,1,1,1,2,1,0,1,1,1,1,1,0,1,2,1,1,1,1],
     [1,2,2,2,2,2,2,2,2,1,2,2,2,2,2,2,2,2,1],
     [1,2,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,2,1],
-    [1,3,2,2,2,2,2,2,2,0,2,2,2,2,2,2,2,3,1],
-    [1,1,2,1,2,1,2,1,1,1,1,1,2,1,2,1,2,1,1],
-    [1,2,2,2,2,1,2,2,2,1,2,2,2,1,2,2,2,2,1],
-    [1,2,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,2,1],
-    [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+    [1,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,1],
+    [1,1,2,1,1,1,2,1,1,1,1,1,2,1,1,1,2,1,1],
+    [1,2,2,2,2,2,2,1,1,1,1,1,2,2,2,2,2,2,1],
+    [1,2,1,1,1,1,2,2,2,1,2,2,2,1,1,1,1,2,1],
+    [1,2,2,2,2,2,2,1,2,2,2,1,2,2,2,2,2,2,1],
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
   ],
   // Level 3
@@ -169,6 +169,10 @@ const finalScoreUI = document.getElementById('finalScore');
 const winScoreUI   = document.getElementById('winScore');
 const hsDisplay    = document.getElementById('hsDisplay');
 const newHsLabel   = document.getElementById('newHsLabel');
+const scoreForm    = document.getElementById('scoreForm');
+const playerNameInput = document.getElementById('playerName');
+const saveScoreBtn = document.getElementById('saveScoreBtn');
+const scoreSaveMsg = document.getElementById('scoreSaveMsg');
 const canvas       = document.getElementById('game');
 const ctx          = canvas.getContext('2d');
 const ltOverlay    = document.getElementById('levelTransition');
@@ -261,11 +265,34 @@ function wrap(v, max) { return ((v % max) + max) % max; }
 function getTile(x, y) {
   const tx = wrap(Math.floor(x+0.5), COLS);
   const ty = wrap(Math.floor(y+0.5), ROWS);
-  return { tx, ty, value: map[ty]?.[tx] ?? 1 }; // Default to wall if out of bounds
+  return { tx, ty, value: map[ty]?.[tx] ?? 1 };
+}
+
+function findSpawnPosition() {
+  const candidates = [
+    { x: 9, y: 16 },
+    { x: 9, y: 15 },
+    { x: 9, y: 14 },
+    { x: 8, y: 16 },
+    { x: 10, y: 16 },
+    { x: 8, y: 15 },
+    { x: 10, y: 15 },
+  ];
+  for (const pos of candidates) {
+    const tile = getTile(pos.x, pos.y);
+    if (tile.value !== 1 && tile.value !== 4) return pos;
+  }
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      const tile = getTile(x, y);
+      if (tile.value !== 1 && tile.value !== 4) return { x, y };
+    }
+  }
+  return { x: 9, y: 16 };
 }
 function isWalkable(x, y, fg=false) {
   const { value } = getTile(x, y);
-  return fg ? value !== 1 : value !== 1 && value !== 4; // Ghosts can walk on 4 (gate), player cannot
+  return fg ? value !== 1 : value !== 1 && value !== 4;
 }
 function canStep(e, d, fg=false) { return isWalkable(e.x+d.x, e.y+d.y, fg); }
 function isCentered(e, tol=0.13) {
@@ -279,9 +306,7 @@ function distSq(ax,ay,bx,by) { const dx=ax-bx, dy=ay-by; return dx*dx+dy*dy; }
 function updateHUD() {
   scoreUI.textContent = score.toLocaleString();
   levelUI.textContent = level;
-  livesUI.innerHTML = lives > 0
-    ? '❤'.repeat(Math.min(lives, 5)) + (lives > 5 ? `+${lives-5}` : '')
-    : '✗';
+  livesUI.textContent = lives > 0 ? `x${lives}` : '0';
   if (score > highScore) {
     highScore = score;
     hsUI.textContent = highScore.toLocaleString();
@@ -292,7 +317,7 @@ function updateHUD() {
 }
 
 function updateHsDisplay() {
-  hsDisplay.textContent = highScore > 0 ? `🏆 RÉCORD: ${highScore.toLocaleString()}` : '';
+  hsDisplay.textContent = highScore > 0 ? `RECORD: ${highScore.toLocaleString()}` : '';
 }
 
 function updateFrightBar() {
@@ -305,6 +330,88 @@ function updateFrightBar() {
       : 'linear-gradient(to right, #1a1aff, #00ffff)';
   } else {
     frightBar.classList.remove('active');
+  }
+}
+
+function resetScoreForm() {
+  if (!scoreForm) return;
+  scoreForm.dataset.saved = 'false';
+  if (playerNameInput) {
+    try {
+      playerNameInput.value = localStorage.getItem('pm_player_name') || '';
+    } catch(e) {
+      playerNameInput.value = '';
+    }
+  }
+  if (saveScoreBtn) {
+    saveScoreBtn.disabled = false;
+    saveScoreBtn.textContent = 'OK';
+  }
+  if (scoreSaveMsg) {
+    scoreSaveMsg.textContent = '';
+    scoreSaveMsg.classList.remove('error');
+  }
+}
+
+function loadLocalScores() {
+  try {
+    const scores = JSON.parse(localStorage.getItem('pm_scores') || '[]');
+    return Array.isArray(scores) ? scores : [];
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveLocalScore(entry) {
+  const scores = [...loadLocalScores(), entry]
+    .filter(item => Number.isFinite(item.score) && item.score >= 0)
+    .sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date))
+    .slice(0, 50);
+  localStorage.setItem('pm_scores', JSON.stringify(scores));
+}
+
+async function submitScore() {
+  if (!scoreForm || scoreForm.dataset.saved === 'true') return;
+  const name = (playerNameInput?.value || '').trim() || 'ANON';
+  const entry = {
+    name: name.slice(0, 14),
+    score: Math.floor(score),
+    level: Math.floor(level),
+    date: new Date().toISOString(),
+  };
+
+  if (saveScoreBtn) {
+    saveScoreBtn.disabled = true;
+    saveScoreBtn.textContent = '...';
+  }
+  if (scoreSaveMsg) {
+    scoreSaveMsg.textContent = 'GUARDANDO...';
+    scoreSaveMsg.classList.remove('error');
+  }
+
+  try {
+    saveLocalScore(entry);
+    try {
+      const res = await fetch('/api/scores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry),
+      });
+      if (!res.ok) throw new Error('API no disponible');
+    } catch(e) {}
+    scoreForm.dataset.saved = 'true';
+    try { localStorage.setItem('pm_player_name', name); } catch(e) {}
+    if (scoreSaveMsg) scoreSaveMsg.textContent = 'PUNTAJE GUARDADO';
+    if (saveScoreBtn) saveScoreBtn.textContent = 'OK';
+  } catch(e) {
+    if (scoreSaveMsg) {
+      scoreSaveMsg.textContent = 'ERROR AL GUARDAR';
+      scoreSaveMsg.classList.add('error');
+    }
+    if (saveScoreBtn) {
+      saveScoreBtn.disabled = false;
+      saveScoreBtn.textContent = 'OK';
+    }
   }
 }
 
@@ -324,12 +431,21 @@ function spawnFloatScore(pts, gx, gy) {
 
 function showCombo(n) {
   const pts = 200 * Math.pow(2, n-1);
-  comboMsg.textContent = `ðŸ‘¾ Ã—${n}  +${pts}`;
+  comboMsg.textContent = `FANTASMA x${n}  +${pts}`;
   comboMsg.style.opacity = '1';
   comboMsg.style.transform = 'translate(-50%,-50%) scale(1.2)';
   setTimeout(() => { comboMsg.style.transform='translate(-50%,-50%) scale(1)'; }, 150);
   if (comboTimeout) clearTimeout(comboTimeout);
   comboTimeout = setTimeout(() => { comboMsg.style.opacity='0'; }, 1100);
+}
+
+function showPowerMode() {
+  comboMsg.textContent = 'MODO CAZA';
+  comboMsg.style.opacity = '1';
+  comboMsg.style.transform = 'translate(-50%,-50%) scale(1.15)';
+  setTimeout(() => { comboMsg.style.transform='translate(-50%,-50%) scale(1)'; }, 150);
+  if (comboTimeout) clearTimeout(comboTimeout);
+  comboTimeout = setTimeout(() => { comboMsg.style.opacity='0'; }, 900);
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -416,7 +532,7 @@ function spawnGhosts() {
     dir: i%2===0 ? {x:1,y:0} : {x:-1,y:0},
     color, name: GHOST_NAMES[i],
     frightened: false, eaten: false, inHouse: i>0,
-    houseTimer: Math.max(0, [0, 120, 240, 360][i] - (level-1)*35), // Longer initial house timers
+    houseTimer: Math.max(0, [0, 120, 240, 360][i] - (level-1)*35),
     home: {x:9, y:9}, scatter: GHOST_SCATTER[i],
     baseSpeed: 0.074 - i*0.004,
     blinkFrame: 0,
@@ -426,7 +542,8 @@ function spawnGhosts() {
 }
 
 function spawnPlayer() {
-  player = { x:9, y:16, dir:{x:0,y:0}, speed:playerSpeed() };
+  const startPos = findSpawnPosition();
+  player = { x:startPos.x, y:startPos.y, dir:{x:0,y:0}, speed:playerSpeed() };
   invTimer = 120;
 }
 
@@ -447,7 +564,9 @@ function showGameOver() {
   gameRunning = false;
   finalScoreUI.textContent = score.toLocaleString();
   newHsLabel.style.display = (score >= highScore && score > 0) ? 'block' : 'none';
+  resetScoreForm();
   showAll(['gameOverScreen']);
+  setTimeout(() => playerNameInput?.focus(), 100);
 }
 
 function showWin() {
@@ -464,7 +583,7 @@ function showWin() {
 
 async function showLevelTransition(lvl) {
   ltNum.textContent = lvl;
-  const msgs = ['Â¡PREPARATE!','Â¡MÃS RÃPIDO!','Â¡A FULL!','Â¡CASI EXPERTO!','Â¡NIVEL Ã‰PICO!'];
+  const msgs = ['PREPARATE','MAS RAPIDO','A FULL','CASI EXPERTO','NIVEL EPICO'];
   ltMsg.textContent = msgs[Math.min(lvl-1, msgs.length-1)];
   ltOverlay.classList.add('active');
   playLevelUp();
@@ -480,6 +599,7 @@ function resetModeCycle() { modeIndex=0; modeTimer=0; currentMode='scatter'; }
 function startRound(reset=false) {
   if (reset) { score=0; lives=3; level=1; }
   map = cloneMap();
+  invalidateMazeCache();
   dots = countDots(map);
   gameRunning=true; paused=false;
   frightTimer=0; frightMax=0; ghostEatCombo=0; pendingDir=null;
@@ -497,8 +617,8 @@ async function nextLevel() {
   if (level > MAX_LEVEL) { showWin(); return; }
   gameRunning = false;
   await showLevelTransition(level);
-  invalidateMazeCache();
   map = cloneMap(); dots = countDots(map);
+  invalidateMazeCache();
   frightTimer=0; frightMax=0; ghostEatCombo=0; pendingDir=null; particles=[];
   spawnPlayer();
   spawnGhosts();

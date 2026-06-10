@@ -1,0 +1,4 @@
+﻿resizeCanvas();
+showMenu();
+updateHUD();
+updateHsDisplay();

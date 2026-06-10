@@ -1,11 +1,13 @@
-const http = require('http');
-const fs   = require('fs');
-const path = require('path');
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const SCORES_FILE = path.join(__dirname, 'scores.json');
-const MAX_SCORES = 50;
-const PORT = process.env.PORT || 3001;
+const MAX_SCORES = 10;
+const PORT = 3022;
 
 const MIME = {
   '.html': 'text/html',

@@ -1,4 +1,4 @@
-﻿// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+﻿﻿// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 function togglePause() {
   if (!gameRunning) return;
   paused = !paused;
@@ -16,6 +16,7 @@ const KEY_MAP = {
 };
 
 document.addEventListener('keydown', e => {
+  if (e.target instanceof HTMLInputElement) return; // Ignore key presses if typing in an input field
   const d = KEY_MAP[e.key];
   if (d) { e.preventDefault(); pendingDir = d; return; }
   if (e.key==='p' || e.key==='P') togglePause();
