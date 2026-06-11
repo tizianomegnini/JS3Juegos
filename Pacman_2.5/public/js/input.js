@@ -5,35 +5,12 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ─── PAUSA ───────────────────────────────────────────────────────────────
-let musicEnabled = true;
+function togglePause() {
+  if (!gameRunning) return;
+  paused = !paused;
+  pauseOverlay.classList.toggle('active', paused);
+}
 
-const btnMusic = document.getElementById("btnMusic");
-
-btnMusic.addEventListener("click", () => {
-  musicEnabled = !musicEnabled;
-
-  if (musicEnabled) {
-    music.play();
-    btnMusic.textContent = "🔊 Música";
-  } else {
-    music.pause();
-    btnMusic.textContent = "🔇 Silencio";
-  }
-});
-const btnExit = document.getElementById("btnExit");
-
-btnExit.addEventListener("click", () => {
-  paused = true;
-  gameRunning = false;
-
-  music.pause();
-
-  // ocultar canvas o juego
-  document.getElementById("gameContainer").style.display = "none";
-
-  // mostrar menú
-  document.getElementById("menu").style.display = "flex";
-});
 // ─── MAPAS DE TECLAS ─────────────────────────────────────────────────────
 // P1: WASD + Flechas
 // P1: WASD

@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const SCORES_FILE = path.join(__dirname, 'scores.json');
 const MAX_SCORES = 10;
-const PORT = 3022;
+const PORT = 3021;
 
 const MIME = {
   '.html': 'text/html',
