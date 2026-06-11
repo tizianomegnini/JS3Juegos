@@ -1,0 +1,18 @@
+/circuit-breaker
+│
+├── server.js
+│
+└── /public
+    ├── index.html
+    ├── style.css
+    ├── main.js
+    │
+    └── /assets
+        ├── pacman.png
+        ├── ghost-red.png
+        └── ghost-orange.png
+
+
+
+
+
