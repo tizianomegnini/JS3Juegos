@@ -1,5 +1,11 @@
 [
   {
+    "name": "Tiziano",
+    "score": 12330,
+    "level": 5,
+    "date": "2026-06-11T12:07:27.399Z"
+  },
+  {
     "name": "tiziano",
     "score": 9090,
     "level": 4,
@@ -52,11 +58,5 @@
     "score": 990,
     "level": 1,
     "date": "2026-06-10T15:49:22.036Z"
-  },
-  {
-    "name": "lghj c",
-    "score": 730,
-    "level": 1,
-    "date": "2026-06-10T16:16:27.924Z"
   }
 ]

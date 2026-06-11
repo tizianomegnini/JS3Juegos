@@ -183,7 +183,7 @@ function drawPlayer() {
     ctx.fillStyle = "#ffffff";
     ctx.font = "14px Arial";
     ctx.textAlign = "center";
-    ctx.fillText("P1", px, py - R - 10);
+    ctx.fillText("", px, py - R - 10);
     ctx.restore();
 }
   
