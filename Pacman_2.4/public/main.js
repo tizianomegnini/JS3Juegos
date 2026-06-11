@@ -21,5 +21,10 @@ function loadSequentially(files, done) {
   };
   next(0);
 }
+const music = document.getElementById("bgMusic");
+music.volume = 0.1;
 
+document.getElementById("playBtn").addEventListener("click", () => {
+  music.play();
+});
 loadSequentially(SCRIPTS);

@@ -855,11 +855,14 @@ body.game-portrait #pauseOverlay {
   }
 
   /* P1 centrado en modo 1P */
+  /* P1 centrado en modo 1P */
   body.mode-1p #dpad.active {
-    display: grid;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 10px;
+
+  position: fixed;
+  bottom: 20px; /* antes seguro era poco */
+  left: 20px;
+  transform: none;
+
   }
 
   /* P2 siempre a la derecha */
@@ -883,4 +886,27 @@ body.game-portrait #pauseOverlay {
 /* ─── HUD 2P: mostrar ambos scores ─── */
 body.mode-2p .p2-hud {
   display: flex !important;
+}
+#ui-top {
+  position: absolute;
+  top: 50px;
+  right: 10px; /* podés cambiar a left si querés */
+  display: flex;
+  gap: 10px;
+  z-index: 9999;
+}
+
+#ui-top button {
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: 1px solid #00ffff;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+#ui-top button:hover {
+  background: #00ffff;
+  color: #000;
 }

@@ -140,7 +140,10 @@
     <div class="hud-value" id="hsUI">0</div>
   </div>
 </div>
-
+<div id="ui-top">
+  <button id="btnMusic">🔊 Música</button>
+  <button id="btnExit">❌ Salir</button>
+</div>
 <!-- ─── CANVAS ─── -->
 <div id="canvasWrap">
   <canvas id="game"></canvas>
@@ -195,10 +198,7 @@
 
 <!-- El atributo loop hace que se repita -->
 <audio id="bgMusic" loop>
-  <source src="musica/tema1.mp3" type="audio/mpeg">
-  <source src="musica/tema2.mp3" type="audio/mpeg">
-  <source src="musica/tema3.mp3" type="audio/mpeg">
-  Tu navegador no soporta audio.
+  <source src="audio/musica.MP3" type="audio/mpeg">
 </audio>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

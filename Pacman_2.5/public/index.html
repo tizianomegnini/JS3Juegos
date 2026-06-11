@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Space Hunter – 2P Edition</title>
+
+  <!-- Forzar orientación landscape en móvil mediante meta (reforzado por JS) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- Background layers -->
+<div id="stars"></div>
+<div id="vignette"></div>
+<div id="scanlines"></div>
+
+<!-- ─── MENU ─── -->
+<div id="menuScreen" class="screen active">
+  <div class="menu-logo">
+    <div class="logo-title">Esa estrella</div>
+    <div class="logo-title">era mi lujo</div>
+    <div class="logo-sub">▸ Los redonditos del espacio ◂</div>
+  </div>
+  <div class="menu-pac-demo">🚀</div>
+  <div class="menu-ghost-row">🦑🕷️🐙</div>
+  <div class="high-score-display" id="hsDisplay"></div>
+
+  <!-- Selector de modo -->
+  <div class="mode-selector">
+    <button class="mode-btn active" id="mode1Btn" onclick="selectMode(1)">1 JUGADOR</button>
+    <button class="mode-btn" id="mode2Btn" onclick="selectMode(2)">2 JUGADORES</button>
+  </div>
+
+  <button class="btn" id="playBtn">▶ JUGAR</button>
+  <a class="btn btn-secondary btn-link" href="ranking.html">RANKING</a>
+
+  <!-- Instrucciones básicas -->
+  <button class="btn btn-secondary" id="howToBtn" onclick="toggleInstructions()">❓ CÓMO JUGAR</button>
+  <div id="instructions" class="instructions-panel" style="display:none">
+    <div class="instr-section">
+      <div class="instr-title">🎮 CONTROLES</div>
+      <div class="instr-row"><span class="instr-key">P1</span> WASD / ↑↓←→</div>
+      <div class="instr-row"><span class="instr-key">P2</span> IJKL (solo modo 2P)</div>
+      <div class="instr-row"><span class="instr-key">P</span> Pausa / <span class="instr-key">R</span> Reiniciar</div>
+    </div>
+    <div class="instr-section">
+      <div class="instr-title">🔵 OBJETIVO</div>
+      <div class="instr-row">Recoge todos los cristales</div>
+      <div class="instr-row">Novas = poder para comer aliens</div>
+      <div class="instr-row">Evita los aliens 👾</div>
+    </div>
+    <div class="instr-section">
+      <div class="instr-title">🏆 PUNTAJE</div>
+      <div class="instr-row">Cristal = 10 pts</div>
+      <div class="instr-row">Nova = 50 pts</div>
+      <div class="instr-row">Alien comido = 200+ pts</div>
+      <div class="instr-row">Combo = puntaje doble</div>
+    </div>
+    <div class="instr-section">
+      <div class="instr-title">👾 MODO 2P</div>
+      <div class="instr-row">Comparten el mapa</div>
+      <div class="instr-row">Gana quien acumule más puntos</div>
+      <div class="instr-row">Si uno pierde vidas, sigue el otro</div>
+    </div>
+    <div class="instr-section">
+      <div class="instr-title">📱 MÓVIL</div>
+      <div class="instr-row">D-Pad táctil aparece en horizontal</div>
+      <div class="instr-row">1P: un D-Pad · 2P: dos D-Pads</div>
+    </div>
+  </div>
+
+  <div style="font-size:7px;color:rgba(255,255,255,0.3);letter-spacing:2px;text-align:center;line-height:1.8">
+    WASD/↑↓←→ · IJKL = P2 · P = PAUSA<br>RECOGE CRISTALES · NOVAS TE DAN PODER
+  </div>
+</div>
+
+<!-- ─── GAME OVER ─── -->
+<div id="gameOverScreen" class="screen">
+  <div class="screen-title">GAME<br>OVER</div>
+  <!-- Puntaje P1 -->
+  <div class="score-display">P1: <span id="finalScore">0</span></div>
+  <!-- Puntaje P2 (oculto en 1P) -->
+  <div class="score-display p2-only" id="p2ScoreDisplay" style="display:none">P2: <span id="finalScore2">0</span></div>
+  <!-- Ganador 2P -->
+  <div id="winnerLabel" class="winner-label" style="display:none"></div>
+  <div id="newHsLabel">🏆 ¡NUEVO RÉCORD!</div>
+  <form id="scoreForm" class="score-form">
+    <label for="playerName">GUARDAR PUNTAJE</label>
+    <div class="score-form-row">
+      <input id="playerName" name="playerName" type="text" maxlength="14" autocomplete="off" placeholder="TU NOMBRE">
+      <button class="btn btn-small" id="saveScoreBtn" type="submit">OK</button>
+    </div>
+    <div id="scoreSaveMsg" class="score-save-msg" aria-live="polite"></div>
+  </form>
+  <a class="btn btn-secondary btn-link" href="ranking.html">VER RANKING</a>
+  <button class="btn" id="goBtn">↩ REINTENTAR</button>
+  <button class="btn btn-secondary" id="goMenuBtn">MENÚ</button>
+</div>
+
+<!-- ─── WIN ─── -->
+<div id="winScreen" class="screen">
+  <div class="screen-title" style="color:#FFD700">¡GANASTE!</div>
+  <div style="font-size:30px">🏆</div>
+  <div class="score-display">P1: <span id="winScore">0</span></div>
+  <div class="score-display p2-only" id="winScore2Display" style="display:none">P2: <span id="winScore2">0</span></div>
+  <div id="winWinnerLabel" class="winner-label" style="display:none"></div>
+  <button class="btn" id="winBtn">▶ JUGAR DE NUEVO</button>
+  <button class="btn btn-secondary" id="winMenuBtn">MENÚ</button>
+</div>
+
+<!-- ─── HUD ─── -->
+<div id="hud">
+  <div class="hud-item">
+    <div class="hud-label">P1 SCORE</div>
+    <div class="hud-value" id="scoreUI">0</div>
+  </div>
+  <div class="hud-item p2-hud" id="p2HudItem" style="display:none">
+    <div class="hud-label" style="color:#FF69B4">P2 SCORE</div>
+    <div class="hud-value" id="score2UI" style="color:#FF69B4">0</div>
+  </div>
+  <div class="hud-item">
+    <div class="hud-label">VIDAS</div>
+    <div class="hud-value" id="livesUI">x3</div>
+  </div>
+  <div class="hud-item p2-hud" id="p2LivesHud" style="display:none">
+    <div class="hud-label" style="color:#FF69B4">VIDAS P2</div>
+    <div class="hud-value" id="lives2UI" style="color:#FF69B4">x3</div>
+  </div>
+  <div class="hud-item">
+    <div class="hud-label">NIVEL</div>
+    <div class="level-badge" id="levelUI">1</div>
+  </div>
+  <div class="hud-item">
+    <div class="hud-label">RÉCORD</div>
+    <div class="hud-value" id="hsUI">0</div>
+  </div>
+</div>
+<div id="ui-top">
+  <button id="btnMusic">🔊 Música</button>
+  <button id="btnExit">❌ Salir</button>
+</div>
+<!-- ─── CANVAS ─── -->
+<div id="canvasWrap">
+  <canvas id="game"></canvas>
+</div>
+
+<!-- ─── PAUSE ─── -->
+<div id="pauseOverlay">
+  <div class="pause-text">⏸ PAUSA</div>
+  <div class="pause-hint">CLICK / P PARA CONTINUAR</div>
+</div>
+
+<!-- ─── LEVEL TRANSITION ─── -->
+<div id="levelTransition">
+  <div class="level-transition-text">NIVEL</div>
+  <div class="level-transition-num" id="ltNum">1</div>
+  <div class="level-transition-text" id="ltMsg">¡PREPARATE!</div>
+</div>
+
+<!-- ─── COMBO ─── -->
+<div id="comboMsg">+200 x1</div>
+
+<!-- ─── FRIGHT BAR ─── -->
+<div id="frightBar"></div>
+
+<!-- ─── ROTATE HINT (portrait móvil) ─── -->
+<div id="rotateHint">
+  <div style="font-size:40px">📱↔️</div>
+  <div style="font-size:8px;letter-spacing:2px;margin-top:12px">GIRÁ EL CELULAR</div>
+  <div style="font-size:7px;color:rgba(255,255,255,0.5);margin-top:6px">EL JUEGO REQUIERE MODO HORIZONTAL</div>
+</div>
+
+<!-- ─── SWIPE HINT ─── -->
+<div id="swipeHint">DESLIZA PARA MOVER</div>
+
+<!-- ─── D-PAD P1 ─── -->
+<div id="dpad" class="dpad-p1">
+  <div class="dpad-label">P1</div>
+  <button class="dpbtn" data-dir="up" data-player="1">▲</button>
+  <button class="dpbtn" data-dir="left" data-player="1">◀</button>
+  <button class="dpbtn" data-dir="right" data-player="1">▶</button>
+  <button class="dpbtn" data-dir="down" data-player="1">▼</button>
+</div>
+
+<!-- ─── D-PAD P2 (solo modo 2P) ─── -->
+<div id="dpad2" class="dpad-p2" style="display:none">
+  <div class="dpad-label" style="color:#FF69B4">P2</div>
+  <button class="dpbtn dpbtn-p2" data-dir="up" data-player="2">▲</button>
+  <button class="dpbtn dpbtn-p2" data-dir="left" data-player="2">◀</button>
+  <button class="dpbtn dpbtn-p2" data-dir="right" data-player="2">▶</button>
+  <button class="dpbtn dpbtn-p2" data-dir="down" data-player="2">▼</button>
+</div>
+
+<!-- El atributo loop hace que se repita -->
+<audio id="bgMusic" loop>
+  <source src="audio/musica.MP3" type="audio/mpeg">
+</audio>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
