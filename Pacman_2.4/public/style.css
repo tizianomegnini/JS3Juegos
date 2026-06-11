@@ -577,12 +577,16 @@
 
   /* ─── RANKING ─── */
   body.ranking-page {
+    background-image: url("../imgs/elindio.png");
+    background-size: cover;        /* Ajusta la imagen a toda la pantalla */
+    background-position: center;   /* Centra la imagen */
+    background-repeat: no-repeat;  /* Evita que se repita */
+    background-attachment: fixed;  /* (opcional) efecto tipo "parallax" */
     justify-content: flex-start;
     overflow-y: auto;
     touch-action: auto;
     user-select: auto;
     padding: 28px 14px;
-    background: radial-gradient(ellipse at center, #0a0a2e 0%, #000011 100%);
   }
 
   .ranking-shell {

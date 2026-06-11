@@ -27,7 +27,7 @@ function renderScores(scores) {
   }
 
   rowsEl.replaceChildren();
-  scores.slice(0, 10).forEach((item, index) => {
+  scores.slice(0, 11).forEach((item, index) => {
     const row = document.createElement('div');
     row.className = 'ranking-row';
     [
@@ -65,7 +65,7 @@ function sortScores(scores) {
       return true;
     })
     .sort((a, b) => Number(b.score) - Number(a.score) || new Date(a.date) - new Date(b.date))
-    .slice(0, 10);
+    .slice(0, 11);
 }
 
 async function loadScores() {

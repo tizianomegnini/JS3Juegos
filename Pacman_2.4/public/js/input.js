@@ -13,19 +13,20 @@ function togglePause() {
 
 // ─── MAPAS DE TECLAS ─────────────────────────────────────────────────────
 // P1: WASD + Flechas
+// P1: WASD
 const KEY_MAP_P1 = {
-  ArrowUp:{x:0,y:-1}, w:{x:0,y:-1}, W:{x:0,y:-1},
-  ArrowDown:{x:0,y:1}, s:{x:0,y:1}, S:{x:0,y:1},
-  ArrowLeft:{x:-1,y:0}, a:{x:-1,y:0}, A:{x:-1,y:0},
-  ArrowRight:{x:1,y:0}, d:{x:1,y:0}, D:{x:1,y:0},
+  w:{x:0,y:-1},
+  s:{x:0,y:1},
+  a:{x:-1,y:0},
+  d:{x:1,y:0},
 };
 
-// P2: IJKL
+// P2: Flechas + IJKL
 const KEY_MAP_P2 = {
-  i:{x:0,y:-1}, I:{x:0,y:-1},
-  k:{x:0,y:1},  K:{x:0,y:1},
-  j:{x:-1,y:0}, J:{x:-1,y:0},
-  l:{x:1,y:0},  L:{x:1,y:0},
+  ArrowUp:{x:0,y:-1},
+  ArrowDown:{x:0,y:1},
+  ArrowLeft:{x:-1,y:0},
+  ArrowRight:{x:1,y:0},
 };
 
 // ─── KEYBOARD ────────────────────────────────────────────────────────────
