@@ -149,6 +149,7 @@ function drawPlayer() {
   ctx.translate(px, py);
   ctx.rotate(angle);
 
+
   if (isMoving) {
     const fl = R * (0.6 + 0.4 * Math.sin(thrusterPhase));
     const flW = R * 0.28;
@@ -178,8 +179,14 @@ function drawPlayer() {
     ctx.closePath();
     ctx.fill();
     ctx.restore();
-  }
-
+    ctx.save();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "14px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("P1", px, py - R - 10);
+    ctx.restore();
+}
+  
   ctx.shadowColor = '#00ccff';
   ctx.shadowBlur  = 10;
 

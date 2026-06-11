@@ -259,9 +259,17 @@ function loseLife(who) {
     spawnParticles(player2.x, player2.y, '#FF69B4', 20, 3);
     lives2--; updateHUD();
     if (lives2 <= 0) {
-      player2 = null; p2alive = false; updateHUD();
-      if (lives <= 0) { gameRunning = false; setTimeout(showGameOver, 700); }
-    } else {
+
+  player2 = null;
+  p2alive = false;
+
+  updateHUD();
+
+  if (!p1alive) {
+    gameRunning = false;
+    setTimeout(showGameOver, 700);
+  }
+}else {
       gameRunning = false;
       setTimeout(() => {
         spawnPlayer2(); spawnGhosts(); ghosts[0]._totalDots = dots;
@@ -277,12 +285,34 @@ function loseLife(who) {
       if (lives <= 0 && (gameMode === 1 || !p2alive)) {
         showGameOver();
       } else if (lives <= 0 && gameMode === 2 && p2alive) {
+
         player = null;
-        spawnGhosts(); ghosts[0]._totalDots = dots;
-        frightTimer = 0; frightMax = 0; ghostEatCombo = 0; pendingDir = null;
+        p1alive = false;
+        if (!p2alive) {
+  gameRunning = false;
+  setTimeout(showGameOver, 700);
+  return;
+}
+
+      spawnGhosts();
+  ghosts[0]._totalDots = dots;
+
+      frightTimer = 0;
+      frightMax = 0;
+      ghostEatCombo = 0;
+
+        pendingDir = null;
         gameRunning = true;
       } else {
-        resetAfterDeath(); gameRunning = true;
+        spawnPlayer();
+        spawnGhosts();
+          ghosts[0]._totalDots = dots;
+          frightTimer = 0;
+          frightMax = 0;
+          ghostEatCombo = 0;
+
+        pendingDir = null;
+        gameRunning = true;
       }
     }, 700);
   }
