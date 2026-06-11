@@ -1,12 +1,15 @@
 /**
  * ranking-dark.css
  * Estilos de la página de ranking — modo oscuro.
+ 
  */
 
 .ranking-wrapper {
   padding: 2rem 0 4rem;
 }
-
+#clear-btn{
+  display:none;
+}
 .ranking-wrapper .container-fluid {
   max-width: 1180px;
 }

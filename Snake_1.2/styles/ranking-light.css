@@ -2,7 +2,9 @@
  * ranking-light.css
  * Estilos de la página de ranking — modo claro.
  */
-
+#clear-btn{
+  display:none;
+}
 .ranking-wrapper {
   padding: 2rem 0 4rem;
 }
