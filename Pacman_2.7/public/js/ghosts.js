@@ -2,7 +2,12 @@
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 function getPlayerTile() {
-  return { x: Math.round(player.x), y: Math.round(player.y) };
+  if (!player || !p1alive) return null;
+
+  return {
+    x: player.x,
+    y: player.y
+  };
 }
 
 // N tiles adelante del jugador en su direcciÃ³n actual
@@ -33,35 +38,31 @@ function dotsLeftRatio() {
 function chooseGhostTarget(g) {
   const pt = getPlayerTile();
 
+  // si no hay jugador válido → fallback seguro
+  if (!pt) {
+    return g.scatter;
+  }
+
   if (g.id === 0) {
-    // â”€â”€ BLINKY â€” perseguidor directo â”€â”€
-    // Modo Elroy: cuando quedan pocos dots ignora scatter y va directo al jugador
-    // aunque estÃ© en fase scatter. El umbral baja con el nivel (mÃ¡s agresivo).
     return pt;
   }
 
   if (g.id === 1) {
-    // â”€â”€ PINKY â€” emboscadora â”€â”€
-    // Apunta 4 tiles adelante del jugador para cortarle el paso.
-    // Si el jugador estÃ¡ quieto, apunta a su tile exacto.
-    const hasDir = player.dir.x !== 0 || player.dir.y !== 0;
+    const hasDir =
+      player &&
+      player.dir &&
+      (player.dir.x !== 0 || player.dir.y !== 0);
+
     return hasDir ? getAheadTile(4) : pt;
   }
 
   if (g.id === 2) {
-    // â”€â”€ INKY â€” flanqueadora caÃ³tica â”€â”€
-    // Toma el punto 2 tiles adelante del jugador y lo refleja
-    // respecto a la posiciÃ³n de Blinky, doblando el vector.
-    // Cuando Blinky estÃ¡ lejos, Inky aparece por el lado opuesto.
     return getInkyTarget();
   }
 
-  // â”€â”€ CLYDE (id=3) â€” el errÃ¡tico â”€â”€
-  // Chase si estÃ¡ lejos del jugador (mÃ¡s de `threshold` tiles).
-  // Huye a su esquina si se acerca demasiado.
-  // El umbral decrece con el nivel: se vuelve mÃ¡s agresivo a medida que avanzÃ¡s.
   const threshold = Math.max(4, 8 - (level - 1));
-  const dist = Math.hypot(g.x - player.x, g.y - player.y);
+  const dist = Math.hypot(g.x - pt.x, g.y - pt.y);
+
   return dist > threshold ? pt : g.scatter;
 }
 
@@ -144,6 +145,18 @@ function getFrightenedDir(g) {
 
 //  MOVE GHOSTS
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function getMainTarget() {
+  const p1 = (player && p1alive) ? player : null;
+  const p2 = (player2 && p2alive) ? player2 : null;
+
+  if (p1 && p2) {
+    const d1 = Math.hypot(p1.x - ghosts[0].x, p1.y - ghosts[0].y);
+    const d2 = Math.hypot(p2.x - ghosts[0].x, p2.y - ghosts[0].y);
+    return d1 < d2 ? p1 : p2;
+  }
+
+  return p1 || p2 || null;
+}
 function moveGhosts() {
   if (frightTimer <= 0) switchModeIfNeeded();
 
@@ -154,100 +167,129 @@ function moveGhosts() {
       ghostEatCombo = 0;
     }
   }
+
   updateFrightBar();
 
+  const target = getMainTarget();
+  if (!target) return;
+
   ghosts.forEach(g => {
-    // â”€â”€ Dentro de la casa: contar timer y salir â”€â”€
+
+    // ── Dentro de la casa ──
     if (g.inHouse) {
       g.houseTimer--;
       if (g.houseTimer <= 0) {
-        g.inHouse    = false;
-        g.eaten      = false;
+        g.inHouse = false;
+        g.eaten = false;
         g.frightened = false;
-        g.x   = g.home.x;
-        g.y   = g.home.y;
+        g.x = g.home.x;
+        g.y = g.home.y;
         g.dir = { x: 0, y: -1 };
       }
       return;
     }
 
-    // â”€â”€ Velocidad segÃºn estado â”€â”€
-    // Blinky Elroy activo: pequeÃ±o bonus de velocidad
     const sp = ghostSpeed(g.baseSpeed, g.frightened, g.eaten);
 
-    // â”€â”€ Elegir direcciÃ³n solo en intersecciones â”€â”€
+    // ── dirección solo en intersecciones ──
     if (isCentered(g)) {
 
       if (g.eaten) {
-        // Vuelve a casa lo mÃ¡s rÃ¡pido posible
         g.dir = getBestDir(g, g.home);
 
       } else if (g.frightened) {
-        // Cada bicho tiene su propio comportamiento de huida
         g.dir = getFrightenedDir(g);
 
       } else {
-        // Modo normal: scatter o chase segÃºn el ciclo
-        // Blinky Elroy ignora scatter cuando estÃ¡ activado
-        const target = currentMode === 'chase' ? chooseGhostTarget(g) : g.scatter;
-        g.dir = getBestDir(g, target);
+        const targetMode =
+          currentMode === 'chase'
+            ? chooseGhostTarget(g)
+            : g.scatter;
+
+        g.dir = getBestDir(g, targetMode);
       }
     }
 
-    // â”€â”€ Aplicar movimiento â”€â”€
+    // ── movimiento ──
     g.x = wrap(g.x + g.dir.x * sp, COLS);
     g.y = wrap(g.y + g.dir.y * sp, ROWS);
-    // Snap-to-grid SOLO si estamos dentro de 10% de la velocidad del grid
+
     const snapThreshold = sp * 0.1;
     if (Math.abs(g.x - Math.round(g.x)) < snapThreshold) g.x = Math.round(g.x);
     if (Math.abs(g.y - Math.round(g.y)) < snapThreshold) g.y = Math.round(g.y);
 
-    // â”€â”€ LlegÃ³ a casa tras ser comido â”€â”€
-    if (g.eaten && Math.round(g.x) === g.home.x && Math.round(g.y) === g.home.y) {
-      g.eaten      = false;
-      g.inHouse    = true;
+    // ── volvió a casa ──
+    if (g.eaten &&
+        Math.round(g.x) === g.home.x &&
+        Math.round(g.y) === g.home.y) {
+      g.eaten = false;
+      g.inHouse = true;
       g.houseTimer = 80;
-      g.dir        = { x: 0, y: -1 };
+      g.dir = { x: 0, y: -1 };
       return;
     }
 
-    // â”€â”€ ColisiÃ³n con el jugador â”€â”€
-    // Colision P1
-    if (invTimer <= 0) {
-      const hit1 = Math.hypot(g.x - player.x, g.y - player.y) < 0.72;
+    // ── COLISIÓN P1 ──
+    const p1 = (player && p1alive) ? player : null;
+
+    if (p1 && invTimer <= 0) {
+      const hit1 = Math.hypot(g.x - p1.x, g.y - p1.y) < 0.72;
+
       if (hit1) {
         if (g.frightened) {
           ghostEatCombo++;
           const pts = 200 * Math.pow(2, ghostEatCombo - 1);
           score += pts;
-          playEatGhost(); showCombo(ghostEatCombo);
+
+          playEatGhost();
+          showCombo(ghostEatCombo);
           spawnParticles(g.x, g.y, g.color, 15, 2.5);
-          spawnFloatScore(pts, g.x, g.y); updateHUD();
-          g.frightened = false; g.eaten = true;
-          g.dir = {x:0,y:0}; g.x = Math.round(g.x); g.y = Math.round(g.y);
-        } else if (!g.eaten) { loseLife('p1'); }
+          spawnFloatScore(pts, g.x, g.y);
+          updateHUD();
+
+          g.frightened = false;
+          g.eaten = true;
+          g.dir = { x: 0, y: 0 };
+          g.x = Math.round(g.x);
+          g.y = Math.round(g.y);
+        } else {
+          loseLife('p1');
+        }
         return;
       }
     }
-    // Colision P2
-    if (gameMode === 2 && player2 && p2alive && invTimer2 <= 0) {
-      const hit2 = Math.hypot(g.x - player2.x, g.y - player2.y) < 0.72;
+
+    // ── COLISIÓN P2 ──
+    const p2 = (player2 && p2alive) ? player2 : null;
+
+    if (gameMode === 2 && p2 && invTimer2 <= 0) {
+      const hit2 = Math.hypot(g.x - p2.x, g.y - p2.y) < 0.72;
+
       if (hit2) {
         if (g.frightened) {
           ghostEatCombo++;
           const pts = 200 * Math.pow(2, ghostEatCombo - 1);
           score2 += pts;
-          playEatGhost(); showCombo(ghostEatCombo);
+
+          playEatGhost();
+          showCombo(ghostEatCombo);
           spawnParticles(g.x, g.y, g.color, 15, 2.5);
-          spawnFloatScore(pts, g.x, g.y); updateHUD();
-          g.frightened = false; g.eaten = true;
-          g.dir = {x:0,y:0}; g.x = Math.round(g.x); g.y = Math.round(g.y);
-        } else if (!g.eaten) { loseLife('p2'); }
+          spawnFloatScore(pts, g.x, g.y);
+          updateHUD();
+
+          g.frightened = false;
+          g.eaten = true;
+          g.dir = { x: 0, y: 0 };
+          g.x = Math.round(g.x);
+          g.y = Math.round(g.y);
+        } else {
+          loseLife('p2');
+        }
       }
     }
+
   });
 }
-
 // LOSE LIFE
 function loseLife(who) {
   who = who || 'p1';
@@ -272,7 +314,8 @@ function loseLife(who) {
 }else {
       gameRunning = false;
       setTimeout(() => {
-        spawnPlayer2(); spawnGhosts(); ghosts[0]._totalDots = dots;
+        spawnPlayer2(); 
+        spawnGhosts(); ghosts[0]._totalDots = dots;
         frightTimer = 0; frightMax = 0; ghostEatCombo = 0; pendingDir2 = null;
         gameRunning = true;
       }, 700);

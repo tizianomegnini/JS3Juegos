@@ -260,7 +260,7 @@ let dotSound = 0;
 let gameMode = 1;          // 1 = 1P, 2 = 2P
 let player2 = null;        // Segundo jugador (null en 1P)
 let score2 = 0;            // Puntaje P2
-// lives2 ELIMINADO — P1 y P2 comparten el pool `lives`
+let lives2 = 3;            // Vidas P2
 let pendingDir2 = null;    // Input pendiente P2
 let invTimer2 = 0;         // Invulnerabilidad P2 tras muerte
 let p1alive = true;
@@ -268,6 +268,8 @@ let p2alive = true;
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  MAP HELPERS
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+function cloneMap() { return MAPS[Math.min(level - 1, MAX_LEVEL - 1)].map(r => r.slice()); }
+function countDots(m) { let c = 0; for (const r of m) for (const v of r) if (v === 2 || v === 3) c++; return c; }
 function wrap(v, max) { return ((v % max) + max) % max; }
 function getTile(x, y) {
   const tx = wrap(Math.floor(x + 0.5), COLS);
@@ -314,12 +316,11 @@ function updateHUD() {
   scoreUI.textContent = score.toLocaleString();
   levelUI.textContent = level;
   livesUI.textContent = lives > 0 ? `x${lives}` : '0';
-
-  // HUD P2 — score propio, pero vidas compartidas (se muestra el mismo pool)
-  const s2ui = document.getElementById('score2UI');
-  const l2ui = document.getElementById('lives2UI');
+  // HUD P2
+  const s2ui  = document.getElementById('score2UI');
+  const l2ui  = document.getElementById('lives2UI');
   if (s2ui) s2ui.textContent = score2.toLocaleString();
-  if (l2ui) l2ui.textContent = lives > 0 ? `x${lives}` : '0';
+  if (l2ui) l2ui.textContent = lives2 > 0 ? `x${lives2}` : '0';
 
   const totalScore = gameMode === 2 ? Math.max(score, score2) : score;
   if (totalScore > highScore) {
@@ -563,20 +564,36 @@ function spawnPlayer() {
 }
 
 function spawnPlayer2() {
-  // P2 spawnea ligeramente desplazado de P1
   const candidates = [
     { x: 9, y: 14 }, { x: 9, y: 15 }, { x: 8, y: 14 },
     { x: 10, y: 14 }, { x: 7, y: 16 }, { x: 11, y: 16 }
   ];
+
   let startPos = candidates[0];
+
   for (const c of candidates) {
     const t = getTile(c.x, c.y);
-    if (t.value !== 1 && t.value !== 4 &&
-        !(c.x === player.x && c.y === player.y)) {
-      startPos = c; break;
+
+    // 🔒 FIX: evitar null
+    if (!t) continue;
+
+    if (
+      t.value !== 1 &&
+      t.value !== 4 &&
+      !(player && c.x === player.x && c.y === player.y)
+    ) {
+      startPos = c;
+      break;
     }
   }
-  player2 = { x: startPos.x, y: startPos.y, dir: { x: 0, y: 0 }, speed: playerSpeed() };
+
+  player2 = {
+    x: startPos.x,
+    y: startPos.y,
+    dir: { x: 0, y: 0 },
+    speed: playerSpeed()
+  };
+
   invTimer2 = 120;
 }
 
@@ -663,8 +680,7 @@ function resetModeCycle() { modeIndex = 0; modeTimer = 0; currentMode = 'scatter
 function startRound(reset = false) {
   if (reset) {
     score = 0; lives = 3; level = 1;
-    score2 = 0; p2alive = true;
-    // lives2 eliminado — pool compartido en `lives`
+    score2 = 0; lives2 = 3; p2alive = true;
   }
   map = cloneMap();
   invalidateMazeCache();
@@ -679,6 +695,7 @@ function startRound(reset = false) {
   ghosts[0]._totalDots = dots;
   resetModeCycle();
   updateHUD();
+  // Sincronizar controles táctiles según modo
   document.body.classList.toggle('mode-2p', gameMode === 2);
   document.body.classList.toggle('mode-1p', gameMode === 1);
 }
@@ -704,17 +721,10 @@ async function nextLevel() {
 function resetAfterDeath() {
   spawnPlayer();
   if (gameMode === 2 && p2alive) spawnPlayer2();
-
   spawnGhosts();
-
-  frightTimer = 0;
-  frightMax = 0;
-  ghostEatCombo = 0;
-
-  pendingDir = null;
-  pendingDir2 = null;
-
-  resetModeCycle();
+  ghosts[0]._totalDots = dots;
+  frightTimer = 0; frightMax = 0; ghostEatCombo = 0;
+  pendingDir = null; resetModeCycle();
 }
 
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
