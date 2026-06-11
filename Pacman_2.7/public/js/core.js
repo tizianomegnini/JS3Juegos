@@ -260,9 +260,11 @@ let dotSound = 0;
 let gameMode = 1;          // 1 = 1P, 2 = 2P
 let player2 = null;        // Segundo jugador (null en 1P)
 let score2 = 0;            // Puntaje P2
-let sharedLives = 3;          // Vidas P2
+// lives2 ELIMINADO — P1 y P2 comparten el pool `lives`
 let pendingDir2 = null;    // Input pendiente P2
 let invTimer2 = 0;         // Invulnerabilidad P2 tras muerte
+let p1alive = true;
+let p2alive = true;
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //  MAP HELPERS
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -311,7 +313,13 @@ function distSq(ax, ay, bx, by) { const dx = ax - bx, dy = ay - by; return dx * 
 function updateHUD() {
   scoreUI.textContent = score.toLocaleString();
   levelUI.textContent = level;
-  livesUI.textContent = sharedLives > 0 ? `x${sharedLives}` : '0';
+  livesUI.textContent = lives > 0 ? `x${lives}` : '0';
+
+  // HUD P2 — score propio, pero vidas compartidas (se muestra el mismo pool)
+  const s2ui = document.getElementById('score2UI');
+  const l2ui = document.getElementById('lives2UI');
+  if (s2ui) s2ui.textContent = score2.toLocaleString();
+  if (l2ui) l2ui.textContent = lives > 0 ? `x${lives}` : '0';
 
   const totalScore = gameMode === 2 ? Math.max(score, score2) : score;
   if (totalScore > highScore) {
@@ -654,12 +662,9 @@ function resetModeCycle() { modeIndex = 0; modeTimer = 0; currentMode = 'scatter
 
 function startRound(reset = false) {
   if (reset) {
-    score = 0;
-    score2 = 0;
-    sharedLives = 3;
-    level = 1;
-    p2alive = true;
-    p1alive = true;
+    score = 0; lives = 3; level = 1;
+    score2 = 0; p2alive = true;
+    // lives2 eliminado — pool compartido en `lives`
   }
   map = cloneMap();
   invalidateMazeCache();
@@ -674,7 +679,6 @@ function startRound(reset = false) {
   ghosts[0]._totalDots = dots;
   resetModeCycle();
   updateHUD();
-  // Sincronizar controles táctiles según modo
   document.body.classList.toggle('mode-2p', gameMode === 2);
   document.body.classList.toggle('mode-1p', gameMode === 1);
 }
